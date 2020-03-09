@@ -1,0 +1,3 @@
+1、espadmin.sql  为 espadmin 完整的sql脚本，适合于第一次导入脚本的用户
+2、espadmin-gen.sql  为 espadmin 代码生成模块更新的sql脚本
+3、espadmin-mnt.sql  为 espadmin 运维管理模块更新的sql脚本

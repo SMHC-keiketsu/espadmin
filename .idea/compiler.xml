@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="espadmin-tools" />
+        <module name="espadmin-logging" />
+        <module name="espadmin-common" />
+        <module name="espadmin-system" />
+        <module name="espadmin-generator" />
+        <module name="espadmin-monitor" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="espadmin" target="1.8" />
+      <module name="espadmin-common" target="1.8" />
+      <module name="espadmin-generator" target="1.8" />
+      <module name="espadmin-logging" target="1.8" />
+      <module name="espadmin-monitor" target="1.8" />
+      <module name="espadmin-system" target="1.8" />
+      <module name="espadmin-tools" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="espadmin-common" options="-parameters" />
+      <module name="espadmin-generator" options="-parameters" />
+      <module name="espadmin-logging" options="-parameters" />
+      <module name="espadmin-monitor" options="-parameters" />
+      <module name="espadmin-system" options="-parameters" />
+      <module name="espadmin-tools" options="-parameters" />
+    </option>
+  </component>
+</project>

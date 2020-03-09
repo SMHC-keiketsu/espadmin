@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/espadmin.iml" filepath="$PROJECT_DIR$/espadmin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/espadmin-common/espadmin-common.iml" filepath="$PROJECT_DIR$/espadmin-common/espadmin-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/espadmin-generator/espadmin-generator.iml" filepath="$PROJECT_DIR$/espadmin-generator/espadmin-generator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/espadmin-logging/espadmin-logging.iml" filepath="$PROJECT_DIR$/espadmin-logging/espadmin-logging.iml" />
+      <module fileurl="file://$PROJECT_DIR$/espadmin-monitor/espadmin-monitor.iml" filepath="$PROJECT_DIR$/espadmin-monitor/espadmin-monitor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/espadmin-system/espadmin-system.iml" filepath="$PROJECT_DIR$/espadmin-system/espadmin-system.iml" />
+      <module fileurl="file://$PROJECT_DIR$/espadmin-tools/espadmin-tools.iml" filepath="$PROJECT_DIR$/espadmin-tools/espadmin-tools.iml" />
+    </modules>
+  </component>
+</project>
