@@ -32,9 +32,9 @@ public class Role implements Serializable {
     @NotBlank
     private String name;
 
-    /** 数据权限类型 全部 、 本级 、 自定义 */
+    /** 数据权限类型 全部 、 本級 、 カスタマイズ */
     @Column(name = "data_scope")
-    private String dataScope = "本级";
+    private String dataScope = "本級";
 
     /** 数值越小，级别越大 */
     @Column(name = "level")

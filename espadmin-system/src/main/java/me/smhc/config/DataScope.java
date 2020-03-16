@@ -21,7 +21,7 @@ import java.util.Set;
 @Component
 public class DataScope {
 
-    private final String[] scopeType = {"全部","本级","自定义"};
+    private final String[] scopeType = {"全部","本級","カスタマイズ"};
 
     private final UserService userService;
 
