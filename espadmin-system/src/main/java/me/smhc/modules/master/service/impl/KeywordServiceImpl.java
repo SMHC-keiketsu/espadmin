@@ -1,37 +1,36 @@
 package me.smhc.modules.master.service.impl;
 
 import me.smhc.modules.master.domain.Keyword;
-import me.smhc.modules.system.service.UserService;
-import me.smhc.modules.system.service.dto.UserDto;
-import me.smhc.utils.*;
 import me.smhc.modules.master.repository.KeywordRepository;
 import me.smhc.modules.master.service.KeywordService;
 import me.smhc.modules.master.service.dto.KeywordDto;
 import me.smhc.modules.master.service.dto.KeywordQueryCriteria;
 import me.smhc.modules.master.service.mapper.KeywordMapper;
+import me.smhc.modules.system.service.UserService;
+import me.smhc.modules.system.service.dto.UserDto;
+import me.smhc.utils.*;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-// 默认不使用缓存
-//import org.springframework.cache.annotation.CacheConfig;
-//import org.springframework.cache.annotation.CacheEvict;
-//import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-import java.util.Map;
-import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
 * @author 布和
 * @date 2020-03-19
 */
 @Service
-//@CacheConfig(cacheNames = "keyword")
+@CacheConfig(cacheNames = "keyword")
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
 public class KeywordServiceImpl implements KeywordService {
 
@@ -48,20 +47,20 @@ public class KeywordServiceImpl implements KeywordService {
     }
 
     @Override
-    //@Cacheable
+    @Cacheable
     public Map<String,Object> queryAll(KeywordQueryCriteria criteria, Pageable pageable){
         Page<Keyword> page = keywordRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
         return PageUtil.toPage(page.map(keywordMapper::toDto));
     }
 
     @Override
-    //@Cacheable
+    @Cacheable
     public List<KeywordDto> queryAll(KeywordQueryCriteria criteria){
         return keywordMapper.toDto(keywordRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
     }
 
     @Override
-    //@Cacheable(key = "#p0")
+    @Cacheable(key = "#p0")
     public KeywordDto findById(Long id) {
         Keyword keyword = keywordRepository.findById(id).orElseGet(Keyword::new);
         ValidationUtil.isNull(keyword.getId(),"Keyword","id",id);
@@ -69,7 +68,7 @@ public class KeywordServiceImpl implements KeywordService {
     }
 
     @Override
-    //@CacheEvict(allEntries = true)
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public KeywordDto create(Keyword resources) {
         UserDto userDto = userService.findByName(SecurityUtils.getUsername());
@@ -79,7 +78,7 @@ public class KeywordServiceImpl implements KeywordService {
     }
 
     @Override
-    //@CacheEvict(allEntries = true)
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void update(Keyword resources) {
         UserDto userDto = userService.findByName(SecurityUtils.getUsername());
@@ -91,7 +90,7 @@ public class KeywordServiceImpl implements KeywordService {
     }
 
     @Override
-    //@CacheEvict(allEntries = true)
+    @CacheEvict(allEntries = true)
     public void deleteAll(Long[] ids) {
         for (Long id : ids) {
             keywordRepository.deleteById(id);

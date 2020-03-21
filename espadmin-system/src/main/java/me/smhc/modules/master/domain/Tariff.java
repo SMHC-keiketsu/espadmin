@@ -7,6 +7,8 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+
+import me.smhc.modules.system.domain.Dept;
 import org.hibernate.annotations.*;
 import java.sql.Timestamp;
 import java.math.BigDecimal;
@@ -24,6 +26,7 @@ public class Tariff implements Serializable {
     /** id */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @NotNull(groups = Update.class)
     @Column(name = "id")
     private Long id;
 
@@ -44,7 +47,7 @@ public class Tariff implements Serializable {
     /** CIF条件 */
     @Column(name = "cif_logic",nullable = false)
     @NotNull
-    private Integer cifLogic;
+    private Boolean cifLogic;
 
     /** 重量（KG） */
     @Column(name = "weight_amount",nullable = false)
@@ -58,7 +61,7 @@ public class Tariff implements Serializable {
     /** 重量条件（KG） */
     @Column(name = "weight_logic",nullable = false)
     @NotNull
-    private Integer weightLogic;
+    private Boolean weightLogic;
 
     @Column(name = "create_time")
     @CreationTimestamp
@@ -76,6 +79,8 @@ public class Tariff implements Serializable {
     /** 用户ID */
     @Column(name = "update_user_id")
     private Long updateUserId;
+
+    public @interface Update {}
 
     public void copy(Tariff source){
         BeanUtil.copyProperties(source,this, CopyOptions.create().setIgnoreNullValue(true));

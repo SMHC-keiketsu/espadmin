@@ -57,7 +57,7 @@ public class KeywordController {
     @Log("修改keyword")
     @ApiOperation("修改keyword")
     @PreAuthorize("@el.check('keyword:edit')")
-    public ResponseEntity<Object> update(@Validated @RequestBody Keyword resources){
+    public ResponseEntity<Object> update(@Validated(Keyword.Update.class) @RequestBody Keyword resources){
         keywordService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

@@ -58,7 +58,7 @@ public class TariffController {
     @Log("修改tariff")
     @ApiOperation("修改tariff")
     @PreAuthorize("@el.check('tariff:edit')")
-    public ResponseEntity<Object> update(@Validated @RequestBody Tariff resources){
+    public ResponseEntity<Object> update(@Validated(Tariff.Update.class) @RequestBody Tariff resources){
         tariffService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

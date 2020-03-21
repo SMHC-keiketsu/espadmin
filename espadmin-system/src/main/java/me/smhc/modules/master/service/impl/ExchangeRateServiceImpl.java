@@ -12,10 +12,9 @@ import me.smhc.modules.master.service.mapper.ExchangeRateMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-// 默认不使用缓存
-//import org.springframework.cache.annotation.CacheConfig;
-//import org.springframework.cache.annotation.CacheEvict;
-//import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -31,7 +30,7 @@ import java.util.LinkedHashMap;
 * @date 2020-03-19
 */
 @Service
-//@CacheConfig(cacheNames = "exchangeRate")
+@CacheConfig(cacheNames = "exchangeRate")
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
 public class ExchangeRateServiceImpl implements ExchangeRateService {
 
@@ -48,20 +47,20 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
     }
 
     @Override
-    //@Cacheable
+    @Cacheable
     public Map<String,Object> queryAll(ExchangeRateQueryCriteria criteria, Pageable pageable){
         Page<ExchangeRate> page = exchangeRateRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
         return PageUtil.toPage(page.map(exchangeRateMapper::toDto));
     }
 
     @Override
-    //@Cacheable
+    @Cacheable
     public List<ExchangeRateDto> queryAll(ExchangeRateQueryCriteria criteria){
         return exchangeRateMapper.toDto(exchangeRateRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
     }
 
     @Override
-    //@Cacheable(key = "#p0")
+    @Cacheable(key = "#p0")
     public ExchangeRateDto findById(Long id) {
         ExchangeRate exchangeRate = exchangeRateRepository.findById(id).orElseGet(ExchangeRate::new);
         ValidationUtil.isNull(exchangeRate.getId(),"ExchangeRate","id",id);
@@ -69,7 +68,7 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
     }
 
     @Override
-    //@CacheEvict(allEntries = true)
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public ExchangeRateDto create(ExchangeRate resources) {
         UserDto userDto = userService.findByName(SecurityUtils.getUsername());
@@ -79,7 +78,7 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
     }
 
     @Override
-    //@CacheEvict(allEntries = true)
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void update(ExchangeRate resources) {
         ExchangeRate exchangeRate = exchangeRateRepository.findById(resources.getId()).orElseGet(ExchangeRate::new);
@@ -91,7 +90,7 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
     }
 
     @Override
-    //@CacheEvict(allEntries = true)
+    @CacheEvict(allEntries = true)
     public void deleteAll(Long[] ids) {
         for (Long id : ids) {
             exchangeRateRepository.deleteById(id);

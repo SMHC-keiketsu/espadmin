@@ -12,10 +12,9 @@ import me.smhc.modules.master.service.mapper.TariffMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-// 默认不使用缓存
-//import org.springframework.cache.annotation.CacheConfig;
-//import org.springframework.cache.annotation.CacheEvict;
-//import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -31,7 +30,7 @@ import java.util.LinkedHashMap;
 * @date 2020-03-17
 */
 @Service
-//@CacheConfig(cacheNames = "tariff")
+@CacheConfig(cacheNames = "tariff")
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
 public class TariffServiceImpl implements TariffService {
 
@@ -48,7 +47,7 @@ public class TariffServiceImpl implements TariffService {
     }
 
     @Override
-    //@Cacheable
+    @Cacheable
     public Map<String,Object> queryAll(TariffQueryCriteria criteria, Pageable pageable){
 
         Page<Tariff> page = tariffRepository.findAll(
@@ -59,13 +58,13 @@ public class TariffServiceImpl implements TariffService {
     }
 
     @Override
-    //@Cacheable
+    @Cacheable
     public List<TariffDto> queryAll(TariffQueryCriteria criteria){
         return tariffMapper.toDto(tariffRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
     }
 
     @Override
-    //@Cacheable(key = "#p0")
+    @Cacheable(key = "#p0")
     public TariffDto findById(Long id) {
         Tariff tariff = tariffRepository.findById(id).orElseGet(Tariff::new);
         ValidationUtil.isNull(tariff.getId(),"Tariff","id",id);
@@ -73,7 +72,7 @@ public class TariffServiceImpl implements TariffService {
     }
 
     @Override
-    //@CacheEvict(allEntries = true)
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public TariffDto create(Tariff resources) {
         UserDto userDto = userService.findByName(SecurityUtils.getUsername());
@@ -83,7 +82,7 @@ public class TariffServiceImpl implements TariffService {
     }
 
     @Override
-    //@CacheEvict(allEntries = true)
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void update(Tariff resources) {
         UserDto userDto = userService.findByName(SecurityUtils.getUsername());
@@ -95,7 +94,7 @@ public class TariffServiceImpl implements TariffService {
     }
 
     @Override
-    //@CacheEvict(allEntries = true)
+    @CacheEvict(allEntries = true)
     public void deleteAll(Long[] ids) {
         for (Long id : ids) {
             tariffRepository.deleteById(id);
@@ -110,10 +109,10 @@ public class TariffServiceImpl implements TariffService {
             map.put("関税名", tariff.getCustoms());
             map.put("ISO", tariff.getCifIso());
             map.put("CIF（円）", tariff.getCifValue());
-            map.put("CIF条件", tariff.getCifLogic());
+            map.put("CIF条件", tariff.getCifLogic()? "以上" : "以下");
             map.put("重量（KG）", tariff.getWeightAmount());
             map.put("重量单位", tariff.getWeightUnit());
-            map.put("重量条件（KG）", tariff.getWeightLogic());
+            map.put("重量条件（KG）", tariff.getWeightLogic()? "以上" : "以下");
             map.put("作成日時",  tariff.getCreateTime());
             map.put("更新日時", tariff.getUpdateTime());
             list.add(map);

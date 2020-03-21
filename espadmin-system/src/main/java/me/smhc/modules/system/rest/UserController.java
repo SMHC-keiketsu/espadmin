@@ -110,7 +110,7 @@ public class UserController {
     public ResponseEntity<Object> create(@Validated @RequestBody User resources){
         checkLevel(resources);
         // 默认密码 123456
-        resources.setPassword(passwordEncoder.encode("123456"));
+        resources.setPassword(passwordEncoder.encode("esp123456"));
         return new ResponseEntity<>(userService.create(resources),HttpStatus.CREATED);
     }
 

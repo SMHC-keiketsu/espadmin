@@ -57,7 +57,7 @@ public class ExchangeRateController {
     @Log("修改rate")
     @ApiOperation("修改rate")
     @PreAuthorize("@el.check('exchangeRate:edit')")
-    public ResponseEntity<Object> update(@Validated @RequestBody ExchangeRate resources){
+    public ResponseEntity<Object> update(@Validated(ExchangeRate.Update.class) @RequestBody ExchangeRate resources){
         exchangeRateService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

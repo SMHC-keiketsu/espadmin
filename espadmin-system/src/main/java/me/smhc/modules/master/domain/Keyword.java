@@ -3,6 +3,7 @@ package me.smhc.modules.master.domain;
 import lombok.Data;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
+import me.smhc.modules.system.domain.Dept;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -23,6 +24,7 @@ public class Keyword implements Serializable {
     /** id */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @NotNull(groups = Update.class)
     @Column(name = "id")
     private Long id;
 
@@ -48,6 +50,8 @@ public class Keyword implements Serializable {
     /** 更新用户ID */
     @Column(name = "update_user_id")
     private Long updateUserId;
+
+    public @interface Update {}
 
     public void copy(Keyword source){
         BeanUtil.copyProperties(source,this, CopyOptions.create().setIgnoreNullValue(true));

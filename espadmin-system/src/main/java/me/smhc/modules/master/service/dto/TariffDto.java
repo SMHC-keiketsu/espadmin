@@ -25,7 +25,7 @@ public class TariffDto implements Serializable {
     private BigDecimal cifValue;
 
     /** CIF条件 */
-    private Integer cifLogic;
+    private Boolean cifLogic;
 
     /** 重量（KG） */
     private BigDecimal weightAmount;
@@ -34,7 +34,7 @@ public class TariffDto implements Serializable {
     private String weightUnit;
 
     /** 重量条件（KG） */
-    private Integer weightLogic;
+    private Boolean weightLogic;
 
     private Timestamp createTime;
 

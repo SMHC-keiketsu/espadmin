@@ -7,6 +7,8 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+
+import me.smhc.modules.system.domain.Dept;
 import org.hibernate.annotations.*;
 import java.sql.Timestamp;
 import java.math.BigDecimal;
@@ -24,6 +26,7 @@ public class ExchangeRate implements Serializable {
     /** ID */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @NotNull(groups = Update.class)
     @Column(name = "id")
     private Long id;
 
@@ -64,6 +67,8 @@ public class ExchangeRate implements Serializable {
     @Column(name = "iso",nullable = false)
     @NotBlank
     private String iso;
+
+    public @interface Update {}
 
     public void copy(ExchangeRate source){
         BeanUtil.copyProperties(source,this, CopyOptions.create().setIgnoreNullValue(true));

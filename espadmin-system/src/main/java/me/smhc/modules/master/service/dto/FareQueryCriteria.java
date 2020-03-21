@@ -17,5 +17,6 @@ import javax.persistence.OneToMany;
 @Data
 public class FareQueryCriteria{
 
-    private String name;
+    @Query
+    private Long deptId;
 }

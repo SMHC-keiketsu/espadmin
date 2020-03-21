@@ -26,6 +26,7 @@ public class Fare implements Serializable {
     /** ID */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @NotNull(groups = Update.class)
     @Column(name = "id")
     private Long id;
 
@@ -49,9 +50,9 @@ public class Fare implements Serializable {
     private BigDecimal price;
 
     /** ISO */
-    @Column(name = "currency",nullable = false)
+    @Column(name = "iso",nullable = false)
     @NotBlank
-    private String currency;
+    private String iso;
 
     /** 创建时间 */
     @Column(name = "create_time")
@@ -70,6 +71,8 @@ public class Fare implements Serializable {
     /** 更新用户ID */
     @Column(name = "update_user_id")
     private Long updateUserId;
+
+    public @interface Update {}
 
     public void copy(Fare source){
         BeanUtil.copyProperties(source,this, CopyOptions.create().setIgnoreNullValue(true));

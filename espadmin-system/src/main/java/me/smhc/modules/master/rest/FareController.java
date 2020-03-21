@@ -57,7 +57,7 @@ public class FareController {
     @Log("修改fare")
     @ApiOperation("修改fare")
     @PreAuthorize("@el.check('fare:edit')")
-    public ResponseEntity<Object> update(@Validated @RequestBody Fare resources){
+    public ResponseEntity<Object> update(@Validated(Fare.Update.class) @RequestBody Fare resources){
         fareService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

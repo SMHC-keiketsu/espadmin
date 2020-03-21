@@ -32,7 +32,7 @@ public class FareDto implements Serializable {
     private BigDecimal price;
 
     /** ISO */
-    private String currency;
+    private String iso;
 
     /** 创建时间 */
     private Timestamp createTime;
