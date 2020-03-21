@@ -1,0 +1,16 @@
+package me.smhc.modules.master.service.mapper;
+
+import me.smhc.base.BaseMapper;
+import me.smhc.modules.master.domain.ExchangeRate;
+import me.smhc.modules.master.service.dto.ExchangeRateDto;
+import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
+
+/**
+* @author 布和
+* @date 2020-03-19
+*/
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface ExchangeRateMapper extends BaseMapper<ExchangeRateDto, ExchangeRate> {
+
+}
