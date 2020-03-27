@@ -23,6 +23,7 @@ public class ExcelConfig implements Serializable {
 
     @Id
     @Column(name = "id")
+    @NotNull(groups = ExchangeRate.Update.class)
     private Long id;
 
     @Column(name = "mainfest_excel",nullable = false)
@@ -42,7 +43,10 @@ public class ExcelConfig implements Serializable {
     @Column(name = "update_user_id")
     private Long updateUserId;
 
+    public @interface Update {}
+
     public void copy(ExcelConfig source){
         BeanUtil.copyProperties(source,this, CopyOptions.create().setIgnoreNullValue(true));
     }
+
 }
