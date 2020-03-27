@@ -48,7 +48,7 @@ public class FareServiceImpl implements FareService {
     }
 
     @Override
-    @Cacheable
+    @Cacheable(key="#criteria+''+#pageable")
     public Map<String,Object> queryAll(FareQueryCriteria criteria, Pageable pageable){
         Page<Fare> page = fareRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
         return PageUtil.toPage(page.map(fareMapper::toDto));

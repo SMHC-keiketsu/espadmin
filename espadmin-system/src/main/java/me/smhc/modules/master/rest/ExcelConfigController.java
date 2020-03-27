@@ -1,7 +1,7 @@
 package me.smhc.modules.master.rest;
 
-import com.sun.deploy.net.HttpUtils;
 import me.smhc.aop.log.Log;
+import me.smhc.modules.master.domain.Agency;
 import me.smhc.modules.master.domain.ExcelConfig;
 import me.smhc.modules.master.service.ExcelConfigService;
 import me.smhc.modules.master.service.dto.ExcelConfigDto;
@@ -60,7 +60,7 @@ public class ExcelConfigController {
     @Log("修改excelConfig")
     @ApiOperation("修改excelConfig")
     @PreAuthorize("@el.check('excelConfig:edit')")
-    public ResponseEntity<Object> update(@Validated @RequestBody ExcelConfig resources){
+    public ResponseEntity<Object> update(@Validated(ExcelConfig.Update.class) @RequestBody ExcelConfig resources){
         excelConfigService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

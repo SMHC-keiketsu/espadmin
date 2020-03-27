@@ -47,7 +47,7 @@ public class TariffServiceImpl implements TariffService {
     }
 
     @Override
-    @Cacheable
+    @Cacheable(key="#criteria+''+#pageable")
     public Map<String,Object> queryAll(TariffQueryCriteria criteria, Pageable pageable){
 
         Page<Tariff> page = tariffRepository.findAll(

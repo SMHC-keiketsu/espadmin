@@ -35,6 +35,26 @@ public class Tariff implements Serializable {
     @NotBlank
     private String customs;
 
+    @Column(name = "customs_code",nullable = false)
+    @NotBlank
+    private String customsCode;
+
+    @Column(name = "government_code",nullable = false)
+    @NotBlank
+    private String governmentCode;
+
+    @Column(name = "government",nullable = false)
+    @NotBlank
+    private String government;
+
+    @Column(name = "customs_sign",nullable = false)
+    @NotBlank
+    private String customsSign;
+
+    @Column(name = "rome_goverment",nullable = false)
+    @NotBlank
+    private String romeGoverment;
+
     /** JPY、USD、CNY、EUR,KRW */
     @Column(name = "cif_iso")
     private String cifIso;

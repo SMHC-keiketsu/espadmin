@@ -1,6 +1,9 @@
 package me.smhc.modules.master.service.dto;
 
 import lombok.Data;
+
+import javax.persistence.Column;
+import javax.validation.constraints.NotBlank;
 import java.sql.Timestamp;
 import java.math.BigDecimal;
 import java.io.Serializable;
@@ -17,6 +20,16 @@ public class TariffDto implements Serializable {
 
     /** 関税名 */
     private String customs;
+
+    private String customsCode;
+
+    private String governmentCode;
+
+    private String government;
+
+    private String customsSign;
+
+    private String romeGoverment;
 
     /** JPY、USD、CNY、EUR,KRW */
     private String cifIso;
