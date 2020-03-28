@@ -1,12 +1,8 @@
 package me.smhc.modules.master.rest;
 
-<<<<<<< HEAD
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-=======
->>>>>>> 1e8f48c88ff24da2ee7db876674476e77c04e730
 import me.smhc.aop.log.Log;
-import me.smhc.modules.master.domain.Agency;
 import me.smhc.modules.master.domain.ExcelConfig;
 import me.smhc.modules.master.service.ExcelConfigService;
 import me.smhc.modules.master.service.dto.ExcelConfigQueryCriteria;
