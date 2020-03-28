@@ -3,6 +3,7 @@ package me.smhc.modules.system.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
+import me.smhc.modules.master.domain.Agency;
 import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -13,9 +14,9 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
-* @author Zheng Jie
-* @date 2019-03-25
-*/
+ * @author Zheng Jie
+ * @date 2019-03-25
+ */
 @Entity
 @Getter
 @Setter
@@ -38,6 +39,14 @@ public class Dept implements Serializable {
     @Column(name = "pid",nullable = false)
     @NotNull
     private Long pid;
+
+    @Column(name="type",nullable = false)
+    @NotNull
+    private int type;
+
+    @OneToOne(fetch = FetchType.EAGER,optional = true)
+    @JoinColumn(name ="agency_id",referencedColumnName = "id")
+    private Agency agency;
 
     @JsonIgnore
     @ManyToMany(mappedBy = "depts")

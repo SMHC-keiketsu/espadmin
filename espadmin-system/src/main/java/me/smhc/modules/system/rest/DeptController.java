@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.Set;
 
 /**
-* @author Zheng Jie
-* @date 2019-03-25
-*/
+ * @author Zheng Jie
+ * @date 2019-03-25
+ */
 @RestController
 @Api(tags = "系统：部门管理")
 @RequestMapping("/api/dept")
@@ -53,7 +53,7 @@ public class DeptController {
     @Log("查询部门")
     @ApiOperation("查询部门")
     @GetMapping
-    @PreAuthorize("@el.check('user:list','dept:list')")
+    @PreAuthorize("@el.check('user:list','dept:list','manifest:list')")
     public ResponseEntity<Object> getDepts(DeptQueryCriteria criteria){
         // 数据权限
         criteria.setIds(dataScope.getDeptIds());
