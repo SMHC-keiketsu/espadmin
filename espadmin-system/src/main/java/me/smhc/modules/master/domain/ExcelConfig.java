@@ -22,6 +22,8 @@ import java.io.Serializable;
 public class ExcelConfig implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @NotNull(groups = Update.class)
     @Column(name = "id")
     private Long id;
 
@@ -41,6 +43,8 @@ public class ExcelConfig implements Serializable {
 
     @Column(name = "update_user_id")
     private Long updateUserId;
+
+    public @interface Update {}
 
     public void copy(ExcelConfig source){
         BeanUtil.copyProperties(source,this, CopyOptions.create().setIgnoreNullValue(true));

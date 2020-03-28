@@ -1,18 +1,24 @@
 package me.smhc.modules.master.domain;
 
-import lombok.Data;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
-import javax.persistence.*;
-import javax.validation.constraints.*;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
-import me.smhc.modules.system.domain.Dept;
-import org.hibernate.annotations.*;
-import java.sql.Timestamp;
-import java.math.BigDecimal;
-import java.io.Serializable;
+import lombok.Data;
 
 /**
 * @author 布和

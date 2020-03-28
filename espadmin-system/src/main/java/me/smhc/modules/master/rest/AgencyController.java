@@ -1,8 +1,9 @@
 package me.smhc.modules.master.rest;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import me.smhc.aop.log.Log;
 import me.smhc.modules.master.domain.Agency;
-import me.smhc.modules.master.domain.Importer;
 import me.smhc.modules.master.service.AgencyService;
 import me.smhc.modules.master.service.dto.AgencyQueryCriteria;
 import org.springframework.data.domain.Pageable;
@@ -11,12 +12,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.annotations.*;
-import java.io.IOException;
+
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
-* @author
+* @author 布和
 * @date 2020-03-24
 */
 @Api(tags = "agency管理")
@@ -58,7 +59,7 @@ public class AgencyController {
     @Log("修改agency")
     @ApiOperation("修改agency")
     @PreAuthorize("@el.check('agency:edit')")
-    public ResponseEntity<Object> update(@Validated(Importer.Update.class) @RequestBody Agency resources){
+    public ResponseEntity<Object> update(@Validated(Agency.Update.class) @RequestBody Agency resources){
         agencyService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

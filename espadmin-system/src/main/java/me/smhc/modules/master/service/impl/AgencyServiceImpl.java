@@ -34,7 +34,7 @@ import java.util.Map;
 //import org.springframework.cache.annotation.Cacheable;
 
 /**
-* @author
+* @author 布和
 * @date 2020-03-24
 */
 @Service
@@ -42,25 +42,20 @@ import java.util.Map;
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
 public class AgencyServiceImpl implements AgencyService {
 
-    private final ExcelConfigRepository excelConfigRepository;
     private final AgencyRepository agencyRepository;
 
     private final AgencyMapper agencyMapper;
 
     private final UserService userService;
 
-    private final ExcelConfigService excelConfigService;
 
-    public AgencyServiceImpl(ExcelConfigRepository excelConfigRepository, AgencyRepository agencyRepository, AgencyMapper agencyMapper, UserService userService, ExcelConfigService excelConfigService) {
-        this.excelConfigRepository = excelConfigRepository;
+    public AgencyServiceImpl(AgencyRepository agencyRepository, AgencyMapper agencyMapper, UserService userService) {
         this.agencyRepository = agencyRepository;
         this.agencyMapper = agencyMapper;
         this.userService = userService;
-        this.excelConfigService = excelConfigService;
     }
 
     @Override
-    @Cacheable(key="#criteria+''+#pageable")
     public Map<String,Object> queryAll(AgencyQueryCriteria criteria, Pageable pageable){
         Page<Agency> page = agencyRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
         return PageUtil.toPage(page.map(agencyMapper::toDto));
@@ -90,11 +85,8 @@ public class AgencyServiceImpl implements AgencyService {
         ExcelConfig excelConfig = new ExcelConfig();
         excelConfig.setCreateUserId(userDto.getId());
         excelConfig.setUpdateUserId(userDto.getId());
+
         resources.setExcelConfig(excelConfig);
-
-        excelConfigRepository.save(excelConfig);
-//        excelConfigService.create(resources.getExcelConfig());
-
         resources.setCreateUserId(userDto.getId());
         resources.setUpdateUserId(userDto.getId());
         return agencyMapper.toDto(agencyRepository.save(resources));

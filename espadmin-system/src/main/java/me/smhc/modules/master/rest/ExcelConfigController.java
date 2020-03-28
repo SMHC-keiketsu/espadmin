@@ -1,21 +1,20 @@
 package me.smhc.modules.master.rest;
 
-import com.sun.deploy.net.HttpUtils;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import me.smhc.aop.log.Log;
 import me.smhc.modules.master.domain.ExcelConfig;
 import me.smhc.modules.master.service.ExcelConfigService;
-import me.smhc.modules.master.service.dto.ExcelConfigDto;
 import me.smhc.modules.master.service.dto.ExcelConfigQueryCriteria;
-import org.hibernate.criterion.Example;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.annotations.*;
-import java.io.IOException;
+
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
 * @author

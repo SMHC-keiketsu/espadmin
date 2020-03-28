@@ -7,7 +7,7 @@ import java.sql.Timestamp;
 import java.io.Serializable;
 
 /**
-* @author
+* @author 布和
 * @date 2020-03-24
 */
 @Data
@@ -42,6 +42,6 @@ public class AgencyDto implements Serializable {
     private Long updateUserId;
 
     private Long excelConfigId;
-
+    /** Excel Config **/
     private ExcelConfig excelConfig;
 }

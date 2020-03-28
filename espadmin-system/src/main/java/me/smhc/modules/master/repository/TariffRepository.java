@@ -1,9 +1,9 @@
 package me.smhc.modules.master.repository;
 
-import me.smhc.modules.master.domain.Tariff;
-import me.smhc.modules.master.domain.Tariff;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
+import me.smhc.modules.master.domain.Tariff;
 
 /**
 * @author 布和

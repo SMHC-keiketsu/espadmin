@@ -13,7 +13,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 
 /**
-* @author
+* @author 布和
 * @date 2020-03-24
 */
 @Entity
@@ -24,7 +24,7 @@ public class Agency implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    @NotNull(groups = Fare.Update.class)
+    @NotNull(groups = Update.class)
     private Long id;
 
     /** 代理店名 */
@@ -71,11 +71,8 @@ public class Agency implements Serializable {
     @Column(name = "update_user_id")
     private Long updateUserId;
 
-    @Column(name = "excel_config_id")
-    private Long excelConfigId;
-
     @OneToOne(fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
-    @JoinColumn(name="excel_config_id",referencedColumnName = "id",insertable= false,updatable = false)
+    @JoinColumn(name="excel_config_id",referencedColumnName = "id")
     private ExcelConfig excelConfig;
 
     public @interface Update {}
