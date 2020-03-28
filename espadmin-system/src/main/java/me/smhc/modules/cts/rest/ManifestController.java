@@ -71,7 +71,7 @@ public class ManifestController {
     @Log("修改manifest")
     @ApiOperation("修改manifest")
     @PreAuthorize("@el.check('manifest:edit')")
-    public ResponseEntity<Object> update(@Validated @RequestBody Manifest resources){
+    public ResponseEntity<Object> update(@Validated(Manifest.Update.class) @RequestBody Manifest resources){
         manifestService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

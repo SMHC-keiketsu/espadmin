@@ -30,6 +30,7 @@ public class Manifest implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @NotNull(groups = Update.class)
     private Long id;
 
     /** 代理商名 */
@@ -292,6 +293,8 @@ public class Manifest implements Serializable {
     /** 更新用户ID 用户ID */
     @Column(name = "update_user_id")
     private Long updateUserId;
+
+    public @interface Update {}
 
     public void copy(Manifest source){
         BeanUtil.copyProperties(source,this, CopyOptions.create().setIgnoreNullValue(true));
