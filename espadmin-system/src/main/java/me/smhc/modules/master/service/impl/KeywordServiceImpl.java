@@ -47,14 +47,13 @@ public class KeywordServiceImpl implements KeywordService {
     }
 
     @Override
-    @Cacheable
     public Map<String,Object> queryAll(KeywordQueryCriteria criteria, Pageable pageable){
         Page<Keyword> page = keywordRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
         return PageUtil.toPage(page.map(keywordMapper::toDto));
     }
 
     @Override
-    @Cacheable
+    @Cacheable(key="#criteria+''+#pageable")
     public List<KeywordDto> queryAll(KeywordQueryCriteria criteria){
         return keywordMapper.toDto(keywordRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
     }

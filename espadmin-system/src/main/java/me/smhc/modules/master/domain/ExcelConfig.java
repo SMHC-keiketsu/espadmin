@@ -25,6 +25,7 @@ public class ExcelConfig implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @NotNull(groups = Update.class)
     @Column(name = "id")
+    @NotNull(groups = ExchangeRate.Update.class)
     private Long id;
 
     @Column(name = "mainfest_excel",nullable = false)
@@ -49,4 +50,5 @@ public class ExcelConfig implements Serializable {
     public void copy(ExcelConfig source){
         BeanUtil.copyProperties(source,this, CopyOptions.create().setIgnoreNullValue(true));
     }
+
 }
