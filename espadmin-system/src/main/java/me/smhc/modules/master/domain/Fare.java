@@ -52,6 +52,7 @@ public class Fare implements Serializable {
     /** ISO */
     @Column(name = "iso",nullable = false)
     @NotBlank
+    @Size(max = 3)
     private String iso;
 
     /** 创建时间 */

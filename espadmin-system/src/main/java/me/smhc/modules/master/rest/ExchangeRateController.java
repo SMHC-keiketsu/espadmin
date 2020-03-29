@@ -1,5 +1,7 @@
 package me.smhc.modules.master.rest;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import me.smhc.aop.log.Log;
 import me.smhc.modules.master.domain.ExchangeRate;
 import me.smhc.modules.master.service.ExchangeRateService;
@@ -10,9 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.annotations.*;
-import java.io.IOException;
+
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
 * @author 布和

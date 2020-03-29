@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 /**
-* @author  
+* @author 布和
 * @date 2020-03-26
 */
 public interface ExcelConfigRepository extends JpaRepository<ExcelConfig, Long>, JpaSpecificationExecutor<ExcelConfig> {

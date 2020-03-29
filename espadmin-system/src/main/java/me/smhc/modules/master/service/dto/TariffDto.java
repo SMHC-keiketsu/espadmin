@@ -1,12 +1,12 @@
 package me.smhc.modules.master.service.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.validation.constraints.NotBlank;
-import java.sql.Timestamp;
-import java.math.BigDecimal;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 
 /**
 * @author 布和
@@ -16,6 +16,7 @@ import java.io.Serializable;
 public class TariffDto implements Serializable {
 
     /** id */
+    @JsonSerialize(using= ToStringSerializer.class)
     private Long id;
 
     /** 関税名 */

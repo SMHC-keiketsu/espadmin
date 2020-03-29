@@ -7,7 +7,7 @@ import java.util.List;
 import me.smhc.annotation.Query;
 
 /**
-* @author
+* @author 布和
 * @date 2020-03-24
 */
 @Data

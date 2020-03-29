@@ -15,7 +15,7 @@ import java.io.Serializable;
 public class ExchangeRateDto implements Serializable {
 
     /** ID */
-    @JsonSerialize(using = ToStringSerializer.class)
+    @JsonSerialize(using= ToStringSerializer.class)
     private Long id;
 
     /** 开始日 */

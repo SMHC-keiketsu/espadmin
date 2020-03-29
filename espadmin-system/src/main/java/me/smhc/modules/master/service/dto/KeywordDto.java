@@ -1,5 +1,7 @@
 package me.smhc.modules.master.service.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import java.sql.Timestamp;
 import java.io.Serializable;
@@ -12,6 +14,7 @@ import java.io.Serializable;
 public class KeywordDto implements Serializable {
 
     /** id */
+    @JsonSerialize(using= ToStringSerializer.class)
     private Long id;
 
     /** キーワード */

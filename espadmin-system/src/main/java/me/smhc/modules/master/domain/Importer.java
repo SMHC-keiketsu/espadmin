@@ -9,11 +9,12 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
 /**
-* @author
+* @author 布和
 * @date 2020-03-25
 */
 @Entity
@@ -30,61 +31,73 @@ public class Importer implements Serializable {
     /** 輸入者符号 */
     @Column(name = "jastpro_code",nullable = false)
     @NotBlank
+    @Size(max = 12)
     private String jastproCode;
 
     /** 法人番号 */
     @Column(name = "corporate_number",nullable = false)
     @NotBlank
+    @Size(max = 17)
     private String corporateNumber;
 
     /** 電話番号 */
     @Column(name = "tel",nullable = false)
     @NotBlank
+    @Size(max = 11)
     private String tel;
 
     /** 郵便番号 */
     @Column(name = "postal_code",nullable = false)
     @NotBlank
+    @Size(max = 9)
     private String postalCode;
 
     /** 輸入者名（英文） */
     @Column(name = "en_company_name",nullable = false)
     @NotBlank
+    @Size(max = 100)
     private String enCompanyName;
 
     /** 住所（英文） */
     @Column(name = "en_address_all",nullable = false)
     @NotBlank
+    @Size(max = 255)
     private String enAddressAll;
 
     /** 住所_都道府県（英文） */
     @Column(name = "en_address_1",nullable = false)
     @NotBlank
+    @Size(max = 35)
     private String enAddress1;
 
     /** 住所_市区町村（英文） */
     @Column(name = "en_address_2",nullable = false)
     @NotBlank
+    @Size(max = 35)
     private String enAddress2;
 
     /** 住所_番地（英文） */
     @Column(name = "en_address_3",nullable = false)
     @NotBlank
+    @Size(max = 35)
     private String enAddress3;
 
     /** 住所_建物（英文） */
     @Column(name = "en_address_4",nullable = false)
     @NotBlank
+    @Size(max = 104)
     private String enAddress4;
 
     /** 輸入者名（和文） */
     @Column(name = "ja_company_name",nullable = false)
     @NotBlank
+    @Size(max = 100)
     private String jaCompanyName;
 
     /** 住所（和文） */
     @Column(name = "ja_address_all",nullable = false)
     @NotBlank
+    @Size(max = 255)
     private String jaAddressAll;
 
     @Column(name = "create_time")

@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -39,26 +40,32 @@ public class Tariff implements Serializable {
     /** 関税名 */
     @Column(name = "customs",nullable = false)
     @NotBlank
+    @Size(max = 100)
     private String customs;
 
     @Column(name = "customs_code",nullable = false)
     @NotBlank
+    @Size(max = 6)
     private String customsCode;
 
     @Column(name = "government_code",nullable = false)
     @NotBlank
+    @Size(max = 6)
     private String governmentCode;
 
     @Column(name = "government",nullable = false)
     @NotBlank
+    @Size(max = 100)
     private String government;
 
     @Column(name = "customs_sign",nullable = false)
     @NotBlank
+    @Size(max = 6)
     private String customsSign;
 
     @Column(name = "rome_goverment",nullable = false)
     @NotBlank
+    @Size(max = 100)
     private String romeGoverment;
 
     /** JPY、USD、CNY、EUR,KRW */
@@ -82,6 +89,7 @@ public class Tariff implements Serializable {
 
     /** 重量单位 */
     @Column(name = "weight_unit")
+    @Size(max = 3)
     private String weightUnit;
 
     /** 重量条件（KG） */

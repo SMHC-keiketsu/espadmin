@@ -1,14 +1,13 @@
 package me.smhc.modules.master.service.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import me.smhc.modules.system.domain.Dept;
 
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import java.sql.Timestamp;
-import java.math.BigDecimal;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 
 /**
 * @author 布和
@@ -18,9 +17,11 @@ import java.io.Serializable;
 public class FareDto implements Serializable {
 
     /** ID */
+    @JsonSerialize(using= ToStringSerializer.class)
     private Long id;
 
     /** 部门名称 */
+    @JsonSerialize(using= ToStringSerializer.class)
     private Long deptId;
 
    private Dept dept;

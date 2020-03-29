@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 /**
-* @author  
+* @author 布和
 * @date 2020-03-25
 */
 public interface ImporterRepository extends JpaRepository<Importer, Long>, JpaSpecificationExecutor<Importer> {

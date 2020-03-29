@@ -3,9 +3,7 @@ package me.smhc.modules.master.service.impl;
 import me.smhc.modules.master.domain.Agency;
 import me.smhc.modules.master.domain.ExcelConfig;
 import me.smhc.modules.master.repository.AgencyRepository;
-import me.smhc.modules.master.repository.ExcelConfigRepository;
 import me.smhc.modules.master.service.AgencyService;
-import me.smhc.modules.master.service.ExcelConfigService;
 import me.smhc.modules.master.service.dto.AgencyDto;
 import me.smhc.modules.master.service.dto.AgencyQueryCriteria;
 import me.smhc.modules.master.service.mapper.AgencyMapper;
@@ -27,11 +25,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-// 默认不使用缓存
-//import org.springframework.cache.annotation.CacheConfig;
-//import org.springframework.cache.annotation.CacheEvict;
-//import org.springframework.cache.annotation.Cacheable;
 
 /**
 * @author 布和

@@ -9,6 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
@@ -30,9 +31,11 @@ public class Agency implements Serializable {
     /** 代理店名 */
     @Column(name = "company_name",nullable = false)
     @NotBlank
+    @Size(max = 100)
     private String companyName;
 
     /** 担当者名 */
+    @Size(max = 20)
     @Column(name = "contact",nullable = false)
     @NotBlank
     private String contact;
@@ -40,6 +43,7 @@ public class Agency implements Serializable {
     /** メールアドレス */
     @Column(name = "email",nullable = false)
     @NotBlank
+    @Size(max = 255)
     private String email;
 
     /** 電話番号 */
@@ -50,11 +54,13 @@ public class Agency implements Serializable {
     /** 郵便番号 */
     @Column(name = "postal_code",nullable = false)
     @NotBlank
+    @Size(max = 9)
     private String postalCode;
 
     /** 住所 */
     @Column(name = "address_all",nullable = false)
     @NotBlank
+    @Size(max = 255)
     private String addressAll;
 
     @Column(name = "create_time")
@@ -71,7 +77,7 @@ public class Agency implements Serializable {
     @Column(name = "update_user_id")
     private Long updateUserId;
 
-    @OneToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
     @JoinColumn(name="excel_config_id",referencedColumnName = "id")
     private ExcelConfig excelConfig;
 

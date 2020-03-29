@@ -1,13 +1,14 @@
 package me.smhc.modules.master.service.dto;
 
-import lombok.Data;
-import java.sql.Timestamp;
-import java.io.Serializable;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import lombok.Data;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
 
 /**
-* @author  
+* @author  布和
 * @date 2020-03-25
 */
 @Data

@@ -1,7 +1,5 @@
 package me.smhc.modules.master.service.impl;
 
-import cn.hutool.core.lang.Snowflake;
-import cn.hutool.core.util.IdUtil;
 import me.smhc.modules.master.domain.ExcelConfig;
 import me.smhc.modules.master.repository.ExcelConfigRepository;
 import me.smhc.modules.master.service.ExcelConfigService;
@@ -11,7 +9,6 @@ import me.smhc.modules.master.service.mapper.ExcelConfigMapper;
 import me.smhc.modules.system.service.UserService;
 import me.smhc.modules.system.service.dto.UserDto;
 import me.smhc.utils.*;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,15 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
-// 默认不使用缓存
-//import org.springframework.cache.annotation.CacheConfig;
-//import org.springframework.cache.annotation.CacheEvict;
-//import org.springframework.cache.annotation.Cacheable;
 
 /**
-* @author
+* @author 布和
 * @date 2020-03-26
 */
 @Service

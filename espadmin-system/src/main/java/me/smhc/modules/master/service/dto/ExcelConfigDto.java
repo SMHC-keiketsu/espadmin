@@ -7,12 +7,13 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 /**
-* @author
+* @author 布和
 * @date 2020-03-26
 */
 @Data
 public class ExcelConfigDto implements Serializable {
 
+    @JsonSerialize(using= ToStringSerializer.class)
     private Long id;
 
     private String manifestExcel;

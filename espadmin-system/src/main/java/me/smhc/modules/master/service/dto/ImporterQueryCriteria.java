@@ -1,13 +1,13 @@
 package me.smhc.modules.master.service.dto;
 
 import lombok.Data;
+import me.smhc.annotation.Query;
 
 import java.sql.Timestamp;
 import java.util.List;
-import me.smhc.annotation.Query;
 
 /**
-* @author
+* @author 布和
 * @date 2020-03-25
 */
 @Data
@@ -21,19 +21,12 @@ public class ImporterQueryCriteria{
     @Query(type = Query.Type.INNER_LIKE)
     private String tel;
 
-    /** 模糊 */
-    @Query(type = Query.Type.INNER_LIKE)
-    private String enAddressAll;
-
-    /** 模糊 */
-    @Query(type = Query.Type.INNER_LIKE)
-    private String jaAddressAll;
-
-    @Query(type = Query.Type.INNER_LIKE)
-    private String enCompanyName;
-
-    @Query(type = Query.Type.INNER_LIKE)
-    private String jaCompanyName;
+    /** or */
+    @Query(blurry = "enAddressAll,jaAddressAll")
+    private String addressAll;
+    /** or */
+    @Query(blurry = "enCompanyName,jaCompanyName")
+    private String companyName;
 
     @Query(type = Query.Type.BETWEEN)
     private List<Timestamp> updateTime;

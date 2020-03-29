@@ -12,7 +12,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 
 /**
-* @author
+* @author 布和
 * @date 2020-03-26
 */
 @Entity
@@ -21,7 +21,7 @@ import java.sql.Timestamp;
 public class ExcelConfig implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @NotNull(groups = Update.class)
     @Column(name = "id")
     private Long id;
