@@ -109,6 +109,12 @@ public class DeptServiceImpl implements DeptService {
     @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public DeptDto create(Dept resources) {
+        if(resources.getAgency() == null || resources.getAgency().getId() == null){
+            resources.setAgency(null);
+        }
+        if(resources.getImporter() == null || resources.getImporter().getId() == null){
+            resources.setImporter(null);
+        }
         return deptMapper.toDto(deptRepository.save(resources));
     }
 

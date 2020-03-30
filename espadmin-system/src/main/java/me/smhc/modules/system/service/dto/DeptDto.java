@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import me.smhc.modules.master.domain.Agency;
+import me.smhc.modules.master.domain.Importer;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -30,6 +31,8 @@ public class DeptDto implements Serializable {
     private Integer type;
 
     private Agency agency;
+
+    private Importer importer;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<DeptDto> children;

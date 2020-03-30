@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import me.smhc.modules.master.domain.Agency;
+import me.smhc.modules.master.domain.Importer;
 import org.hibernate.annotations.CreationTimestamp;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -47,6 +49,10 @@ public class Dept implements Serializable {
     @OneToOne(fetch = FetchType.EAGER,optional = true)
     @JoinColumn(name ="agency_id",referencedColumnName = "id")
     private Agency agency;
+
+    @OneToOne(fetch = FetchType.EAGER,optional = true)
+    @JoinColumn(name="importer_id",referencedColumnName = "id")
+    private Importer importer;
 
     @JsonIgnore
     @ManyToMany(mappedBy = "depts")
