@@ -15,8 +15,6 @@ import java.sql.Timestamp;
 @Data
 public class TariffDto implements Serializable {
 
-    /** id */
-    @JsonSerialize(using= ToStringSerializer.class)
     private Long id;
 
     /** 関税名 */

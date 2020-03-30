@@ -21,7 +21,7 @@ import java.sql.Timestamp;
 public class ExcelConfig implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @NotNull(groups = Update.class)
     @Column(name = "id")
     private Long id;

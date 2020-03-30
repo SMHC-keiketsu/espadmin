@@ -13,8 +13,6 @@ import java.io.Serializable;
 @Data
 public class KeywordDto implements Serializable {
 
-    /** id */
-    @JsonSerialize(using= ToStringSerializer.class)
     private Long id;
 
     /** キーワード */

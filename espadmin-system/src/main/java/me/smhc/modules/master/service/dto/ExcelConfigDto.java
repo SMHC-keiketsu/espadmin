@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 @Data
 public class ExcelConfigDto implements Serializable {
 
-    @JsonSerialize(using= ToStringSerializer.class)
     private Long id;
 
     private String manifestExcel;

@@ -6,6 +6,7 @@ import me.smhc.aop.log.Log;
 import me.smhc.modules.master.domain.Agency;
 import me.smhc.modules.master.service.AgencyService;
 import me.smhc.modules.master.service.dto.AgencyQueryCriteria;
+import me.smhc.utils.ThrowableUtil;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -69,7 +70,11 @@ public class AgencyController {
     @PreAuthorize("@el.check('agency:del')")
     @DeleteMapping
     public ResponseEntity<Object> deleteAll(@RequestBody Long[] ids) {
-        agencyService.deleteAll(ids);
+        try{
+            agencyService.deleteAll(ids);
+        }catch (Throwable e){
+            ThrowableUtil.throwForeignKeyException(e, "所选代理店中存在部门关联，请取消关联后再试");
+        }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -6,6 +6,7 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import me.smhc.exception.BadRequestException;
+import me.smhc.exception.EntityExistException;
 import me.smhc.modules.cts.domain.Manifest;
 import me.smhc.modules.cts.repository.ManifestRepository;
 import me.smhc.modules.cts.service.ManifestService;
@@ -124,9 +125,9 @@ public class ManifestServiceImpl implements ManifestService {
                 deptId = userDto.getDept().getId();
             }
             DeptDto deptDto = deptService.findById(deptId);
-            if(ObjectUtil.isNotNull(deptDto)){
-                Agency agency = deptDto.getAgency();
-                ExcelConfig excelConfig = agency.getExcelConfig();
+            Agency agency = deptDto.getAgency();
+            ExcelConfig excelConfig = agency.getExcelConfig();
+            if(ObjectUtil.isNotNull(excelConfig.getMainFestExcel())){
                 JSONObject jsonObject =  new JSONObject(excelConfig.getMainFestExcel());
                 for (Map<String,Object> row: readAll) {
                     Manifest manifest = new Manifest();
@@ -138,6 +139,10 @@ public class ManifestServiceImpl implements ManifestService {
                     Date date = DateUtil.parse(row.get(jsonObject.getStr("flightDate")).toString());
                     manifest.setFlightDate(date);
                     manifest.setHawbNo(row.get(jsonObject.getStr("hawbNo")).toString());
+                    // Check manifest if exist
+                    if(manifestRepository.findByMawbNoAndHawbNo(manifest.getMawbNo(),manifest.getHawbNo()) != null){
+                        throw  new EntityExistException(Manifest.class,"hawbNO",manifest.getHawbNo());
+                    }
                     manifest.setPcs(Integer.parseInt(row.get(jsonObject.getStr("pcs")).toString()));
                     manifest.setWeight(new BigDecimal(row.get(jsonObject.getStr("weight")).toString()));
                     manifest.setWeightCode(row.get(jsonObject.getStr("weightCode")).toString());
@@ -247,7 +252,7 @@ public class ManifestServiceImpl implements ManifestService {
                 }
                 return true;
             }else {
-                throw new BadRequestException("Excel解析失敗");
+                throw new BadRequestException( deptDto.getName() +"はエクセルフォーマットの設定がない");
             }
         }catch (Exception e){
             throw e;

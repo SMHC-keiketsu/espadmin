@@ -27,7 +27,7 @@ public class DeptDto implements Serializable {
 
     private Long pid;
 
-    private int type;
+    private Integer type;
 
     private Agency agency;
 

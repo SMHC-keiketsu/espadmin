@@ -9,4 +9,13 @@ import me.smhc.modules.cts.domain.Manifest;
 * @date 2020-03-24
 */
 public interface ManifestRepository extends JpaRepository<Manifest, Long>, JpaSpecificationExecutor<Manifest> {
+
+    /**
+     * 根据mawbNo和hawbNo查询Manifest
+     * @param mawbNo
+     * @param hawbNo
+     * @return
+     */
+    Manifest findByMawbNoAndHawbNo(String mawbNo,String hawbNo);
+
 }

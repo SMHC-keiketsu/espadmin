@@ -77,7 +77,7 @@ public class Agency implements Serializable {
     @Column(name = "update_user_id")
     private Long updateUserId;
 
-    @OneToOne(fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
+    @OneToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinColumn(name="excel_config_id",referencedColumnName = "id")
     private ExcelConfig excelConfig;
 

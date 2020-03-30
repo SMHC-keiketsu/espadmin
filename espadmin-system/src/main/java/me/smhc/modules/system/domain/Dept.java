@@ -42,7 +42,7 @@ public class Dept implements Serializable {
 
     @Column(name="type",nullable = false)
     @NotNull
-    private int type;
+    private Integer type;
 
     @OneToOne(fetch = FetchType.EAGER,optional = true)
     @JoinColumn(name ="agency_id",referencedColumnName = "id")

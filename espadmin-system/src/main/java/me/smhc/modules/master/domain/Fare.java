@@ -30,13 +30,8 @@ public class Fare implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    /** 部门名称 */
-    @Column(name = "dept_id",nullable = false)
-    @NotNull
-    private Long deptId;
-
     @OneToOne(fetch = FetchType.EAGER, optional = true)
-    @JoinColumn(name = "dept_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "dept_id", referencedColumnName = "id")
     private Dept dept;
 
     /** 重量 */

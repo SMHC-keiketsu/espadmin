@@ -17,13 +17,9 @@ import java.sql.Timestamp;
 public class FareDto implements Serializable {
 
     /** ID */
-    @JsonSerialize(using= ToStringSerializer.class)
     private Long id;
 
     /** 部门名称 */
-    @JsonSerialize(using= ToStringSerializer.class)
-    private Long deptId;
-
    private Dept dept;
 
     /** 重量 */

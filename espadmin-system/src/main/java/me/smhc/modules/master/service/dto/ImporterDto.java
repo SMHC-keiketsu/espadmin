@@ -14,8 +14,6 @@ import java.sql.Timestamp;
 @Data
 public class ImporterDto implements Serializable {
 
-    /** 防止精度丢失 */
-    @JsonSerialize(using= ToStringSerializer.class)
     private Long id;
 
     /** 輸入者符号 */

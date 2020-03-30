@@ -1,7 +1,5 @@
 package me.smhc.modules.master.service.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import me.smhc.modules.master.domain.ExcelConfig;
 
@@ -15,7 +13,6 @@ import java.io.Serializable;
 @Data
 public class AgencyDto implements Serializable {
 
-    @JsonSerialize(using= ToStringSerializer.class)
     private Long id;
 
     /** 代理店名 */
@@ -44,9 +41,6 @@ public class AgencyDto implements Serializable {
 
     private Long updateUserId;
 
-
-    @JsonSerialize(using= ToStringSerializer.class)
-    private Long excelConfigId;
     /** Excel Config **/
     private ExcelConfig excelConfig;
 }
