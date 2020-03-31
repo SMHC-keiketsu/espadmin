@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.Map;
 import java.util.List;
 import java.io.IOException;
+import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -30,6 +31,13 @@ public interface FareService {
     */
     List<FareDto> queryAll(FareQueryCriteria criteria);
 
+    /**
+     * 上传Excel文件，导入到数据库
+     * @param deptId
+     * @param multipartFile
+     * @return boolean 返回true/false
+     */
+    Boolean create(Long deptId, MultipartFile multipartFile);
     /**
      * 根据ID查询
      * @param id ID
@@ -63,4 +71,5 @@ public interface FareService {
     * @throws IOException /
     */
     void download(List<FareDto> all, HttpServletResponse response) throws IOException;
+
 }

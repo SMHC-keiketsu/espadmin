@@ -1,5 +1,7 @@
 package me.smhc.modules.master.rest;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import me.smhc.aop.log.Log;
 import me.smhc.modules.master.domain.Fare;
 import me.smhc.modules.master.service.FareService;
@@ -10,9 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.annotations.*;
-import java.io.IOException;
+import org.springframework.web.multipart.MultipartFile;
+
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
 * @author 布和
@@ -35,6 +38,13 @@ public class FareController {
     @PreAuthorize("@el.check('fare:list')")
     public void download(HttpServletResponse response, FareQueryCriteria criteria) throws IOException {
         fareService.download(fareService.queryAll(criteria), response);
+    }
+
+    @ApiOperation("导入Excel数据")
+    @PostMapping(value = "/uploadExcel")
+    @PreAuthorize("@el.check('manifest:add')")
+    public ResponseEntity<Object> create(@RequestParam Long deptId, @RequestParam("file") MultipartFile file){
+        return new ResponseEntity<>(fareService.create(deptId,file),HttpStatus.CREATED);
     }
 
     @GetMapping

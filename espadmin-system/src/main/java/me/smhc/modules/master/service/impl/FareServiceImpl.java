@@ -1,14 +1,23 @@
 package me.smhc.modules.master.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.poi.excel.ExcelReader;
+import cn.hutool.poi.excel.ExcelUtil;
+import me.smhc.exception.BadRequestException;
+import me.smhc.exception.EntityExistException;
 import me.smhc.modules.master.domain.Fare;
 import me.smhc.modules.master.repository.FareRepository;
 import me.smhc.modules.master.service.FareService;
 import me.smhc.modules.master.service.dto.FareDto;
 import me.smhc.modules.master.service.dto.FareQueryCriteria;
 import me.smhc.modules.master.service.mapper.FareMapper;
+import me.smhc.modules.system.domain.Dept;
+import me.smhc.modules.system.service.DeptService;
 import me.smhc.modules.system.service.UserService;
+import me.smhc.modules.system.service.dto.DeptDto;
 import me.smhc.modules.system.service.dto.UserDto;
 import me.smhc.utils.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -17,9 +26,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,11 +51,16 @@ public class FareServiceImpl implements FareService {
 
     private final UserService userService;
 
+    private final DeptService deptService;
 
-    public FareServiceImpl(FareRepository fareRepository, FareMapper fareMapper, UserService userService) {
+    @Value("${file.maxSize}")
+    private long maxSize;
+
+    public FareServiceImpl(FareRepository fareRepository, FareMapper fareMapper, UserService userService, DeptService deptService) {
         this.fareRepository = fareRepository;
         this.fareMapper = fareMapper;
         this.userService = userService;
+        this.deptService = deptService;
     }
 
     @Override
@@ -76,6 +92,44 @@ public class FareServiceImpl implements FareService {
         resources.setCreateUserId(userDto.getId());
         resources.setUpdateUserId(userDto.getId());
         return fareMapper.toDto(fareRepository.save(resources));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean create(Long deptId, MultipartFile multipartFile) {
+        FileUtil.checkSize(maxSize, multipartFile.getSize());
+        ExcelReader reader = ExcelUtil.getReader(FileUtil.toFile(multipartFile));
+        List<Map<String,Object>> readAll = reader.readAll();
+        if(ObjectUtil.isNull(readAll)){
+            throw new BadRequestException("Excel解析失敗");
+        }
+        try {
+            UserDto userDto = userService.findByName(SecurityUtils.getUsername());
+            DeptDto deptDto = deptService.findById(deptId);
+            if(ObjectUtil.isNull(deptId)){
+                deptId = userDto.getDept().getId();
+            }
+            for (Map<String,Object> row: readAll){
+                Fare fare = new Fare();
+                Dept dept = new Dept();
+                dept.setId(deptId);
+                fare.setWeight(new BigDecimal((row.get("重量").toString() )));
+                fare.setPrice(new BigDecimal((row.get("価格").toString() )));
+                fare.setDept(dept);
+                fare.setIso((row.get("ISO").toString() ));
+                fare.setUpdateUserId(userDto.getId());
+                fare.setCreateUserId(userDto.getId());
+                // check 检查 有没有重复
+                if(fareRepository.findByDeptAndIsoAndPrice(fare.getDept(),fare.getIso(),fare.getPrice()) != null){
+                    throw  new EntityExistException(Fare.class,"dept",fare.getDept().getName() + ",货币:" + fare.getIso() + ",价格:" + fare.getPrice());
+                }
+                this.create(fare);
+            }
+            return true;
+        }
+        catch (Exception e){
+            throw e;
+        }
     }
 
     @Override
