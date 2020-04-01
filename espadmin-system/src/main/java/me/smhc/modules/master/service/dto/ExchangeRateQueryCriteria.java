@@ -13,13 +13,13 @@ import me.smhc.annotation.Query;
 @Data
 public class ExchangeRateQueryCriteria{
 
-    /** 精确 */
-    @Query
-    private BigDecimal rate;
+    /**
+     * 查询货币类型，汇率
+     * or查询 右模糊
+     */
+    @Query(blurry = "rate,iso",type = Query.Type.RIGHT_LIKE)
+    private String queryAll;
 
-    /** 模糊 */
-    @Query(type = Query.Type.INNER_LIKE)
-    private String iso;
     /** BETWEEN */
     @Query(type = Query.Type.BETWEEN)
     private List<Timestamp> updateTime;

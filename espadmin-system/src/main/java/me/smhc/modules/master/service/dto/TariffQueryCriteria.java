@@ -13,18 +13,19 @@ import me.smhc.annotation.Query;
 @Data
 public class TariffQueryCriteria{
 
-    /** 模糊 */
-    @Query(type = Query.Type.INNER_LIKE)
-    private String customs;
-
-    /** 精确 */
-    @Query
-    private BigDecimal cifValue;
+    /**
+     * 查询税関名/CIF(円)/重量(KG)
+     * 模糊查询
+     */
+    @Query(blurry = "customs,cifValue,weightAmount",type = Query.Type.RIGHT_LIKE)
+    private String queryAll;
 
     /** 精确 */
     @Query
     private BigDecimal weightAmount;
-    /** BETWEEN */
+    /**
+     * 查询更新时间的区间
+     */
     @Query(type = Query.Type.BETWEEN)
     private List<Timestamp> updateTime;
 }

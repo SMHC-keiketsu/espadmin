@@ -13,14 +13,16 @@ import me.smhc.annotation.Query;
 @Data
 public class AgencyQueryCriteria{
 
-    /** 模糊 */
-    @Query(type = Query.Type.INNER_LIKE)
-    private String contact;
+    /**
+     * or然后再模糊查询
+     * 查询电话号或担当着名
+     */
+    @Query(blurry = "tel,contact",type = Query.Type.INNER_LIKE)
+    private String queryAll;
 
-    /** 模糊 */
-    @Query(type = Query.Type.INNER_LIKE)
-    private String tel;
-
+    /**
+     * 查询更新时间的区间
+     */
     @Query(type = Query.Type.BETWEEN)
     private List<Timestamp> updateTime;
 }
