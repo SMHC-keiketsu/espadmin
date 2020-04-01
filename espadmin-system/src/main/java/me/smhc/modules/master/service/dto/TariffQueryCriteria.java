@@ -17,7 +17,7 @@ public class TariffQueryCriteria{
      * 查询税関名/CIF(円)/重量(KG)
      * 模糊查询
      */
-    @Query(blurry = "customs,cifValue,weightAmount",type = Query.Type.RIGHT_LIKE)
+    @Query(blurry = "customs,cifValue,weightAmount",type=Query.Type.INNER_LIKE)
     private String queryAll;
 
     /** 精确 */

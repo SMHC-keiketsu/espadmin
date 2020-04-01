@@ -1,5 +1,6 @@
 package me.smhc.modules.master.service.impl;
 
+import me.smhc.config.RedisConfig;
 import me.smhc.modules.master.domain.Agency;
 import me.smhc.modules.master.domain.ExcelConfig;
 import me.smhc.modules.master.repository.AgencyRepository;
@@ -10,11 +11,15 @@ import me.smhc.modules.master.service.mapper.AgencyMapper;
 import me.smhc.modules.system.service.UserService;
 import me.smhc.modules.system.service.dto.UserDto;
 import me.smhc.utils.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +30,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 
 /**
 * @author 布和
@@ -41,11 +47,14 @@ public class AgencyServiceImpl implements AgencyService {
 
     private final UserService userService;
 
+    private final RedisUtils redisUtils;
 
-    public AgencyServiceImpl(AgencyRepository agencyRepository, AgencyMapper agencyMapper, UserService userService) {
+
+    public AgencyServiceImpl(AgencyRepository agencyRepository, AgencyMapper agencyMapper, UserService userService, RedisUtils redisUtils) {
         this.agencyRepository = agencyRepository;
         this.agencyMapper = agencyMapper;
         this.userService = userService;
+        this.redisUtils = redisUtils;
     }
 
     @Override
@@ -93,6 +102,9 @@ public class AgencyServiceImpl implements AgencyService {
         UserDto userDto = userService.findByName(SecurityUtils.getUsername());
         resources.setUpdateUserId(userDto.getId());
         ValidationUtil.isNull( agency.getId(),"Agency","id",resources.getId());
+        String pattern = "dept::*";
+        List<String> keys = redisUtils.scan(pattern);
+        redisUtils.del(keys.toArray(new String[keys.size()]));
         agency.copy(resources);
         agencyRepository.save(agency);
     }

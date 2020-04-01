@@ -47,10 +47,13 @@ public class ImporterServiceImpl implements ImporterService {
 
     private final UserService userService;
 
-    public ImporterServiceImpl(ImporterRepository importerRepository, ImporterMapper importerMapper, UserService userService) {
+    private final RedisUtils redisUtils;
+
+    public ImporterServiceImpl(ImporterRepository importerRepository, ImporterMapper importerMapper, UserService userService, RedisUtils redisUtils) {
         this.importerRepository = importerRepository;
         this.importerMapper = importerMapper;
         this.userService = userService;
+        this.redisUtils = redisUtils;
     }
 
     @Override
@@ -94,6 +97,9 @@ public class ImporterServiceImpl implements ImporterService {
         UserDto userDto = userService.findByName(SecurityUtils.getUsername());
         resources.setUpdateUserId(userDto.getId());
         ValidationUtil.isNull( importer.getId(),"Importer","id",resources.getId());
+        String pattern = "dept::*";
+        List<String> keys = redisUtils.scan(pattern);
+        redisUtils.del(keys.toArray(new String[keys.size()]));
         importer.copy(resources);
         importerRepository.save(importer);
     }

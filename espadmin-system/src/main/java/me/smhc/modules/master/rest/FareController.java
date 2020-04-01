@@ -42,7 +42,7 @@ public class FareController {
 
     @ApiOperation("导入Excel数据")
     @PostMapping(value = "/uploadExcel")
-    @PreAuthorize("@el.check('manifest:add')")
+    @PreAuthorize("@el.check('fare:add')")
     public ResponseEntity<Object> create(@RequestParam Long deptId, @RequestParam("file") MultipartFile file){
         return new ResponseEntity<>(fareService.create(deptId,file),HttpStatus.CREATED);
     }
