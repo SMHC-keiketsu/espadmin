@@ -18,10 +18,10 @@ public class FareQueryCriteria{
     private Dept dept;
 
     /**
-     * or右模糊查询
+     * or 模糊查询
      * 查询重量，价格，货币
      */
-    @Query(blurry = "weight,price,iso",type=Query.Type.INNER_LIKE)
+    @Query(blurry = "weight,price,iso",type = Query.Type.INNER_LIKE)
     private String queryAll;
     /**
      * 查询更新时间的区间

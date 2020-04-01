@@ -17,7 +17,7 @@ public class AgencyQueryCriteria{
      * or然后再模糊查询
      * 查询电话号或担当着名
      */
-    @Query(blurry = "tel,contact",type=Query.Type.INNER_LIKE)
+    @Query(blurry = "tel,contact",type = Query.Type.INNER_LIKE)
     private String queryAll;
 
     /**

@@ -15,9 +15,9 @@ public class ExchangeRateQueryCriteria{
 
     /**
      * 查询货币类型，汇率
-     * or查询 右模糊
+     * or模糊查询
      */
-    @Query(blurry = "rate,iso",type=Query.Type.INNER_LIKE)
+    @Query(blurry = "rate,iso",type = Query.Type.INNER_LIKE)
     private String queryAll;
 
     /** BETWEEN */

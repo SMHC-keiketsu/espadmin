@@ -16,7 +16,7 @@ public class ImporterQueryCriteria{
     /**
      * 輸入者名/住所/法人番号/電話番号
      */
-    @Query(blurry = "enAddressAll,jaAddressAll,enCompanyName,jaCompanyName,tel,corporateNumber",type=Query.Type.INNER_LIKE)
+    @Query(blurry = "enAddressAll,jaAddressAll,enCompanyName,jaCompanyName,tel,corporateNumber",type = Query.Type.INNER_LIKE)
     private String queryAll;
 
     /**
