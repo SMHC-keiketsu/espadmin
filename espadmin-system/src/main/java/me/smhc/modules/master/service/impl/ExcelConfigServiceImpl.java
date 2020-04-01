@@ -14,13 +14,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -35,12 +33,13 @@ public class ExcelConfigServiceImpl implements ExcelConfigService {
     private final ExcelConfigRepository excelConfigRepository;
 
     private final ExcelConfigMapper excelConfigMapper;
-
+    private final RedisUtils redisUtils;
     private final UserService userService;
 
-    public ExcelConfigServiceImpl(ExcelConfigRepository excelConfigRepository, ExcelConfigMapper excelConfigMapper, UserService userService) {
+    public ExcelConfigServiceImpl(ExcelConfigRepository excelConfigRepository, ExcelConfigMapper excelConfigMapper, RedisUtils redisUtils, UserService userService) {
         this.excelConfigRepository = excelConfigRepository;
         this.excelConfigMapper = excelConfigMapper;
+        this.redisUtils = redisUtils;
         this.userService = userService;
     }
 
@@ -80,6 +79,15 @@ public class ExcelConfigServiceImpl implements ExcelConfigService {
         UserDto userDto = userService.findByName(SecurityUtils.getUsername());
         resources.setUpdateUserId(userDto.getId());
         ValidationUtil.isNull( excelConfig.getId(),"ExcelConfig","id",resources.getId());
+
+        // 如果ExcelConfig改变了，需要手动清理下缓存
+        String pattern = "agency::*";
+        List<String> keys = redisUtils.scan(pattern);
+        redisUtils.del(keys.toArray(new String[keys.size()]));
+        pattern = "dept::*";
+        keys = redisUtils.scan(pattern);
+        redisUtils.del(keys.toArray(new String[keys.size()]));
+
         excelConfig.copy(resources);
         excelConfigRepository.save(excelConfig);
     }
