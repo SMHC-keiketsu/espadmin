@@ -1,22 +1,21 @@
 package me.smhc.modules.cts.service;
 
-import me.smhc.modules.cts.domain.Manifest;
-import me.smhc.modules.cts.service.dto.ManifestDto;
-import me.smhc.modules.cts.service.dto.ManifestQueryCriteria;
-import me.smhc.service.dto.LocalStorageDto;
+import me.smhc.modules.cts.domain.ManifestMawb;
+import me.smhc.modules.cts.service.dto.ManifestMawbDto;
+import me.smhc.modules.cts.service.dto.ManifestMawbQueryCriteria;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Map;
-import java.util.List;
-import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 /**
 * @author jhf
 * @date 2020-03-24
 */
-public interface ManifestService {
+public interface ManifestMawbService {
 
     /**
     * 查询数据分页
@@ -24,28 +23,28 @@ public interface ManifestService {
     * @param pageable 分页参数
     * @return Map<String,Object>
     */
-    Map<String,Object> queryAll(ManifestQueryCriteria criteria, Pageable pageable);
+    Map<String,Object> queryAll(ManifestMawbQueryCriteria criteria, Pageable pageable);
 
     /**
     * 查询所有数据不分页
     * @param criteria 条件参数
-    * @return List<ManifestDto>
+    * @return List<ManifestMawbDto>
     */
-    List<ManifestDto> queryAll(ManifestQueryCriteria criteria);
+    List<ManifestMawbDto> queryAll(ManifestMawbQueryCriteria criteria);
 
     /**
      * 根据ID查询
      * @param id ID
      * @return ManifestDto
      */
-    ManifestDto findById(Long id);
+    ManifestMawbDto findById(Long id);
 
     /**
     * 创建
     * @param resources /
-    * @return ManifestDto
+    * @return ManifestMawbDto
     */
-    ManifestDto create(Manifest resources);
+    ManifestMawbDto create(ManifestMawb resources);
 
     /**
      * 上传
@@ -58,7 +57,7 @@ public interface ManifestService {
     * 编辑
     * @param resources /
     */
-    void update(Manifest resources);
+    void update(ManifestMawb resources);
 
     /**
     * 多选删除
@@ -72,5 +71,5 @@ public interface ManifestService {
     * @param response /
     * @throws IOException /
     */
-    void download(List<ManifestDto> all, HttpServletResponse response) throws IOException;
+    void download(List<ManifestMawbDto> all, HttpServletResponse response) throws IOException;
 }

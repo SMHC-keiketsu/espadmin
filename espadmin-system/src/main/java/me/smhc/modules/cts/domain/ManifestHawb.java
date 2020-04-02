@@ -1,21 +1,18 @@
 package me.smhc.modules.cts.domain;
 
-import lombok.Data;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import javax.persistence.*;
-import javax.persistence.CascadeType;
-import javax.validation.constraints.*;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
-import me.smhc.modules.system.domain.Dept;
-import org.hibernate.annotations.*;
-
-import java.sql.Timestamp;
-import java.math.BigDecimal;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.Date;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 
 /**
 * @author jhf
@@ -23,8 +20,8 @@ import java.util.Date;
 */
 @Entity
 @Data
-@Table(name="manifest")
-public class Manifest implements Serializable {
+@Table(name="manifest_hawb")
+public class ManifestHawb implements Serializable {
 
     /** ID */
     @Id
@@ -33,25 +30,9 @@ public class Manifest implements Serializable {
     @NotNull(groups = Update.class)
     private Long id;
 
-    /** 代理商名 */
-    @ManyToOne(fetch = FetchType.EAGER, optional = true)
-    @JoinColumn(name = "dept_id", referencedColumnName = "id")
-    private Dept dept;
-
-    /** MAWB番号 */
-    @Column(name = "mawb_no",nullable = false)
-    @NotBlank
-    private String mawbNo;
-
-    /** FlightNO */
-    @Column(name = "flight_no",nullable = false)
-    @NotBlank
-    private String flightNo;
-
-    /** FlightDate */
-    @Column(name = "flight_date")
-    @NotNull
-    private Date flightDate;
+    /** manifest_mawb_id */
+    @Column(name = "manifest_mawb_id")
+    private Long manifestMawbId;
 
     /** HAWB番号 */
     @Column(name = "hawb_no")
@@ -236,46 +217,6 @@ public class Manifest implements Serializable {
     @Column(name = "reserve_6")
     private String reserve6;
 
-    /** 预留7 */
-    @Column(name = "reserve_7")
-    private String reserve7;
-
-    /** 预留8 */
-    @Column(name = "reserve_8")
-    private String reserve8;
-
-    /** 预留9 */
-    @Column(name = "reserve_9")
-    private String reserve9;
-
-    /** 预留10 */
-    @Column(name = "reserve_10")
-    private String reserve10;
-
-    /** 预留11 */
-    @Column(name = "reserve_11")
-    private String reserve11;
-
-    /** 预留12 */
-    @Column(name = "reserve_12")
-    private String reserve12;
-
-    /** 预留13 */
-    @Column(name = "reserve_13")
-    private String reserve13;
-
-    /** 预留14 */
-    @Column(name = "reserve_14")
-    private String reserve14;
-
-    /** 预留15 */
-    @Column(name = "reserve_15")
-    private String reserve15;
-
-    /** 预留16 */
-    @Column(name = "reserve_16")
-    private String reserve16;
-
     /** 创建时间 */
     @Column(name = "create_time",nullable = false)
     @CreationTimestamp
@@ -296,7 +237,7 @@ public class Manifest implements Serializable {
 
     public @interface Update {}
 
-    public void copy(Manifest source){
+    public void copy(ManifestHawb source){
         BeanUtil.copyProperties(source,this, CopyOptions.create().setIgnoreNullValue(true));
     }
 }

@@ -1,6 +1,7 @@
 package me.smhc.modules.cts.service.dto;
 
 import lombok.Data;
+import me.smhc.modules.cts.domain.ManifestMawb;
 import me.smhc.modules.system.domain.Dept;
 
 import java.sql.Timestamp;
@@ -13,7 +14,7 @@ import java.util.Date;
 * @date 2020-03-24
 */
 @Data
-public class ManifestDto implements Serializable {
+public class ManifestHawbDto implements Serializable {
 
     /**
      *
@@ -23,17 +24,8 @@ public class ManifestDto implements Serializable {
     /** ID */
     private Long id;
 
-    /** 代理商名 */
-    private Dept dept;
-
-    /** MAWB番号 */
-    private String mawbNo;
-
-    /** FlightNO */
-    private String flightNo;
-
-    /** FlightDate */
-    private Date flightDate;
+    /** manifestMawb **/
+    private Long manifestMawbId;
 
     /** HAWB番号 */
     private String hawbNo;
@@ -169,36 +161,6 @@ public class ManifestDto implements Serializable {
 
     /** 预留6 */
     private String reserve6;
-
-    /** 预留7 */
-    private String reserve7;
-
-    /** 预留8 */
-    private String reserve8;
-
-    /** 预留9 */
-    private String reserve9;
-
-    /** 预留10 */
-    private String reserve10;
-
-    /** 预留11 */
-    private String reserve11;
-
-    /** 预留12 */
-    private String reserve12;
-
-    /** 预留13 */
-    private String reserve13;
-
-    /** 预留14 */
-    private String reserve14;
-
-    /** 预留15 */
-    private String reserve15;
-
-    /** 预留16 */
-    private String reserve16;
 
     /** 创建时间 */
     private Timestamp createTime;
