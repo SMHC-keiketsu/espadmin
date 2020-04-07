@@ -4,6 +4,8 @@ import lombok.Data;
 import me.smhc.modules.cts.domain.ManifestHawb;
 import me.smhc.modules.system.domain.Dept;
 
+import javax.persistence.Column;
+import javax.persistence.Version;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -40,23 +42,31 @@ public class ManifestMawbDto implements Serializable {
     /** manifestHawb  list **/
     List<ManifestHawb> manifestHawbList;
 
-    /** 预留1 */
-    private String reserve1;
+    /** mawb类型 **/
+    private String type;
 
-    /** 预留2 */
-    private String reserve2;
+    /** 状态 **/
+    private String status;
 
-    /** 预留3 */
-    private String reserve3;
+    /** IDA amount **/
+    private Long idaAmount;
 
-    /** 预留4 */
-    private String reserve4;
+    /** ida left amount **/
+    private Long idaLeftAmount;
 
-    /** 预留5 */
-    private String reserve5;
+    /** mic amount **/
+    private Long micAmount;
+    /** mic left amount **/
+    private Long micLeftAmount;
 
-    /** 预留6 */
-    private String reserve6;
+    /** hch amount **/
+    private Long hchAmount;
+
+    /** hch left amount **/
+    private Long hchLeftAmount;
+
+    /** 数据版本号 乐观锁*/
+    private Long reserve1;
 
     /** 创建时间 */
     private Timestamp createTime;
