@@ -4,6 +4,7 @@ import lombok.Data;
 import me.smhc.modules.cts.domain.ManifestMawb;
 import me.smhc.modules.system.domain.Dept;
 
+import javax.persistence.Column;
 import java.sql.Timestamp;
 import java.math.BigDecimal;
 import java.io.Serializable;
@@ -143,6 +144,24 @@ public class ManifestHawbDto implements Serializable {
 
     /** 着払い金額 */
     private BigDecimal cashOnDeliveryAmount;
+
+    /**ida type **/
+    private Integer idaType;
+
+    /** ida type status **/
+    private Integer idaTypeStatus;
+
+    /**mic type **/
+    private Integer micType;
+
+    /** mic type status **/
+    private Integer micTypeStatus;
+
+    /**hch type **/
+    private Integer hchType;
+
+    /** hch type status **/
+    private Integer hchTypeStatus;
 
     /** 预留1 */
     private String reserve1;

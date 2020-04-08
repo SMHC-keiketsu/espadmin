@@ -6,6 +6,7 @@ import lombok.Data;
 import me.smhc.modules.system.domain.Dept;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import springfox.documentation.service.ApiListing;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -57,9 +58,40 @@ public class ManifestMawb implements Serializable {
     @JoinColumn(name = "manifest_mawb_id")
     List<ManifestHawb> manifestHawbList;
 
-    /** 预留1 */
+    /** mawb类型 **/
+    @Column(name = "type")
+    private String type;
+
+    /** 状态 **/
+    @Column(name = "status")
+    private String status;
+
+    /** IDA amount **/
+    @Column(name = "ida_amount")
+    private Long idaAmount;
+
+    /** ida left amount **/
+    @Column(name = "ida_left_amount")
+    private Long idaLeftAmount;
+
+    /** mic amount **/
+    @Column(name="mic_amount")
+    private Long micAmount;
+    /** mic left amount **/
+    @Column(name = "mic_left_amount")
+    private Long micLeftAmount;
+
+    /** hch amount **/
+    @Column(name="hch_amount")
+    private Long hchAmount;
+    /** hch left amount **/
+    @Column(name = "hch_left_amount")
+    private Long hchLeftAmount;
+
+    /** 数据版本号 乐观锁*/
+    @Version
     @Column(name = "reserve_1")
-    private String reserve1;
+    private Long reserve1;
 
     /** 预留2 */
     @Column(name = "reserve_2")

@@ -193,6 +193,30 @@ public class ManifestHawb implements Serializable {
     @Column(name = "cash_on_delivery_amount")
     private BigDecimal cashOnDeliveryAmount;
 
+    /**ida type **/
+    @Column(name = "ida_type")
+    private Integer idaType;
+
+    /** ida type status **/
+    @Column(name = "ida_type_status")
+    private Integer idaTypeStatus;
+
+    /**mic type **/
+    @Column(name = "mic_type")
+    private Integer micType;
+
+    /** mic type status **/
+    @Column(name = "mic_type_status")
+    private Integer micTypeStatus;
+
+    /**hch type **/
+    @Column(name = "hch_type")
+    private Integer hchType;
+
+    /** hch type status **/
+    @Column(name = "hch_type_status")
+    private Integer hchTypeStatus;
+
     /** 预留1 */
     @Column(name = "reserve_1")
     private String reserve1;
