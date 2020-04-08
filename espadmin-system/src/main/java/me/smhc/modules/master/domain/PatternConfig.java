@@ -22,15 +22,21 @@ public class PatternConfig implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @NotNull(groups = Tariff.Update.class)
     @Column(name = "id")
     private Long id;
 
+    /** 代理店ID */
     @Column(name = "dept_id")
     private Long deptId;
 
     /** 同一部门内，名字不可重复 */
     @Column(name = "name")
     private String name;
+
+    /** 共同配置 */
+    @Column(name = "ida_mic_com_config")
+    private String idaMicComConfig;
 
     /** IDA配置 */
     @Column(name = "ida_config")
@@ -57,6 +63,8 @@ public class PatternConfig implements Serializable {
 
     @Column(name = "update_user_id")
     private Long updateUserId;
+
+    public @interface Update {}
 
     public void copy(PatternConfig source){
         BeanUtil.copyProperties(source,this, CopyOptions.create().setIgnoreNullValue(true));

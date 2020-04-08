@@ -17,6 +17,8 @@ public class PatternConfigDto implements Serializable {
 
     /** 同一部门内，名字不可重复 */
     private String name;
+    /** 共同配置 */
+    private String idaMicComConfig;
 
     /** IDA配置 */
     private String idaConfig;

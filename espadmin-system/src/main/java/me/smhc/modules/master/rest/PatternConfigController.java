@@ -2,6 +2,7 @@ package me.smhc.modules.master.rest;
 
 import me.smhc.aop.log.Log;
 import me.smhc.modules.master.domain.PatternConfig;
+import me.smhc.modules.master.domain.Tariff;
 import me.smhc.modules.master.service.PatternConfigService;
 import me.smhc.modules.master.service.dto.PatternConfigQueryCriteria;
 import org.springframework.data.domain.Pageable;
@@ -57,7 +58,7 @@ public class PatternConfigController {
     @Log("修改pattern")
     @ApiOperation("修改pattern")
     @PreAuthorize("@el.check('patternConfig:edit')")
-    public ResponseEntity<Object> update(@Validated @RequestBody PatternConfig resources){
+    public ResponseEntity<Object> update(@Validated(PatternConfig.Update.class) @RequestBody PatternConfig resources){
         patternConfigService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
