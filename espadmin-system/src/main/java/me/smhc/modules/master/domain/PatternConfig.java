@@ -48,11 +48,6 @@ public class PatternConfig implements Serializable {
     @Column(name = "update_user_id")
     private Long updateUserId;
 
-    /** ＭＡＷＢ番号 */
-    @Column(name = "mawb_no",nullable = false)
-    @NotBlank
-    private String mawbNo;
-
     /** 申告条件 */
     @Column(name = "jyo",nullable = false)
     @NotBlank
@@ -177,6 +172,15 @@ public class PatternConfig implements Serializable {
     @Column(name = "hch_dst",nullable = false)
     @NotBlank
     private String hchDst;
+
+    /** 税関官署  */
+    @Column(name = "chc",nullable = false)
+    @NotBlank
+    private String chc;
+    /** 委託元混載業 */
+    @Column(name = "ibb",nullable = false)
+    @NotBlank
+    private String ibb;
 
     public @interface Update {}
 

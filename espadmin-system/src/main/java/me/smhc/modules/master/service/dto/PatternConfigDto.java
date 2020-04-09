@@ -1,8 +1,9 @@
 package me.smhc.modules.master.service.dto;
 
 import lombok.Data;
-import java.sql.Timestamp;
+
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 /**
 * @author 布和
@@ -26,9 +27,6 @@ public class PatternConfigDto implements Serializable {
     private Timestamp updateTime;
 
     private Long updateUserId;
-
-    /** ＭＡＷＢ番号 */
-    private String mawbNo;
 
     /** 申告条件 */
     private String jyo;
@@ -104,4 +102,10 @@ public class PatternConfigDto implements Serializable {
 
     /** 仕向地 */
     private String hchDst;
+
+    /** 税関官署  */
+    private String chc;
+
+    /** 委託元混載業 */
+    private String ibb;
 }
