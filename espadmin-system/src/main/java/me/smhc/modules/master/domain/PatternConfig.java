@@ -22,16 +22,18 @@ public class PatternConfig implements Serializable {
 
     /** 搬入保税蔵置場 */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @NotNull(groups = Update.class)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "dept_id")
+    @Column(name = "dept_id",nullable = false)
+    @NotNull
     private Long deptId;
 
     /** 同一部门内，名字不可重复 */
-    @Column(name = "name")
+    @Column(name = "name",nullable = false)
+    @NotBlank
     private String name;
 
     @Column(name = "create_time")
@@ -173,14 +175,70 @@ public class PatternConfig implements Serializable {
     @NotBlank
     private String hchDst;
 
-    /** 税関官署  */
+    /** 税関官署 */
     @Column(name = "chc",nullable = false)
     @NotBlank
     private String chc;
+
     /** 委託元混載業 */
     @Column(name = "ibb",nullable = false)
     @NotBlank
     private String ibb;
+
+    /** インボイス価格区分コード */
+    @Column(name = "ip1",nullable = false)
+    @NotBlank
+    private String ip1;
+
+    /** インボイス価格条件コード */
+    @Column(name = "ip2",nullable = false)
+    @NotBlank
+    private String ip2;
+
+    /** インボイス通貨コード */
+    @Column(name = "ip3",nullable = false)
+    @NotBlank
+    private String ip3;
+
+    /** インボイス価格 */
+    @Column(name = "ip4",nullable = false)
+    @NotBlank
+    private String ip4;
+
+    /** 運賃区分コード */
+    @Column(name = "fr1",nullable = false)
+    @NotBlank
+    private String fr1;
+
+    /** 運賃通貨コード */
+    @Column(name = "fr2",nullable = false)
+    @NotBlank
+    private String fr2;
+
+    /** 運賃 */
+    @Column(name = "fr3",nullable = false)
+    @NotBlank
+    private String fr3;
+
+    /** 保険区分コード */
+    @Column(name = "in1",nullable = false)
+    @NotBlank
+    private String in1;
+
+    /** 保険通貨コード */
+    @Column(name = "in2",nullable = false)
+    @NotBlank
+    private String in2;
+
+    /** 保険金額 */
+    @Column(name = "in3",nullable = false)
+    @NotBlank
+    private String in3;
+
+    /** 原産地コード */
+    @Column(name = "or",nullable = false)
+    @NotBlank
+    private String or;
 
     public @interface Update {}
 

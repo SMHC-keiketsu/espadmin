@@ -1,9 +1,8 @@
 package me.smhc.modules.master.service.dto;
 
 import lombok.Data;
-
-import java.io.Serializable;
 import java.sql.Timestamp;
+import java.io.Serializable;
 
 /**
 * @author 布和
@@ -103,9 +102,42 @@ public class PatternConfigDto implements Serializable {
     /** 仕向地 */
     private String hchDst;
 
-    /** 税関官署  */
+    /** 税関官署 */
     private String chc;
 
     /** 委託元混載業 */
     private String ibb;
+
+    /** インボイス価格区分コード */
+    private String ip1;
+
+    /** インボイス価格条件コード */
+    private String ip2;
+
+    /** インボイス通貨コード */
+    private String ip3;
+
+    /** インボイス価格 */
+    private String ip4;
+
+    /** 運賃区分コード */
+    private String fr1;
+
+    /** 運賃通貨コード */
+    private String fr2;
+
+    /** 運賃 */
+    private String fr3;
+
+    /** 保険区分コード */
+    private String in1;
+
+    /** 保険通貨コード */
+    private String in2;
+
+    /** 保険金額 */
+    private String in3;
+
+    /** 原産地コード */
+    private String or;
 }
