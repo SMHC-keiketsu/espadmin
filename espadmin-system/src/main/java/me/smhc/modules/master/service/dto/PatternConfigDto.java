@@ -1,6 +1,8 @@
 package me.smhc.modules.master.service.dto;
 
 import lombok.Data;
+import me.smhc.modules.system.domain.Dept;
+
 import java.sql.Timestamp;
 import java.io.Serializable;
 
@@ -14,7 +16,7 @@ public class PatternConfigDto implements Serializable {
     /** 搬入保税蔵置場 */
     private Long id;
 
-    private Long deptId;
+    private Dept dept;
 
     /** 同一部门内，名字不可重复 */
     private String name;

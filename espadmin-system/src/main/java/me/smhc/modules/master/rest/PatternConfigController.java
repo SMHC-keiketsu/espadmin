@@ -2,9 +2,10 @@ package me.smhc.modules.master.rest;
 
 import me.smhc.aop.log.Log;
 import me.smhc.modules.master.domain.PatternConfig;
-import me.smhc.modules.master.domain.Tariff;
 import me.smhc.modules.master.service.PatternConfigService;
 import me.smhc.modules.master.service.dto.PatternConfigQueryCriteria;
+import me.smhc.modules.system.domain.Dept;
+import me.smhc.utils.StringUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.annotations.*;
 import java.io.IOException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -38,6 +40,24 @@ public class PatternConfigController {
         patternConfigService.download(patternConfigService.queryAll(criteria), response);
     }
 
+    @GetMapping(value = "/checkName")
+    @Log("查询pattern的name")
+    @ApiOperation("查询pattern的name")
+    @PreAuthorize("@el.check('patternConfig:list')")
+    public ResponseEntity<Object> checkName(String name, Dept dept){
+        Boolean flag = patternConfigService.findName(name,dept);
+        if(StringUtils.isBlank(name)){
+            return new ResponseEntity<>("名称不能为空",HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if(dept.getId() == null){
+            return new ResponseEntity<>("代理店不能为空",HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if(!flag) {
+            return new ResponseEntity<>(flag,HttpStatus.OK);
+        }
+        return new ResponseEntity<>(flag,HttpStatus.OK);
+    }
+
     @GetMapping
     @Log("查询pattern")
     @ApiOperation("查询pattern")
@@ -51,6 +71,10 @@ public class PatternConfigController {
     @ApiOperation("新增pattern")
     @PreAuthorize("@el.check('patternConfig:add')")
     public ResponseEntity<Object> create(@Validated @RequestBody PatternConfig resources){
+        boolean flag = patternConfigService.findName(resources.getName(),resources.getDept());
+        if(!flag){
+            return new ResponseEntity<>("名称不能重复",HttpStatus.OK);
+        }
         return new ResponseEntity<>(patternConfigService.create(resources),HttpStatus.CREATED);
     }
 

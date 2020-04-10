@@ -3,6 +3,7 @@ package me.smhc.modules.master.service;
 import me.smhc.modules.master.domain.PatternConfig;
 import me.smhc.modules.master.service.dto.PatternConfigDto;
 import me.smhc.modules.master.service.dto.PatternConfigQueryCriteria;
+import me.smhc.modules.system.domain.Dept;
 import org.springframework.data.domain.Pageable;
 import java.util.Map;
 import java.util.List;
@@ -57,10 +58,12 @@ public interface PatternConfigService {
     void deleteAll(Long[] ids);
 
     /**
-    * 导出数据
+    * 导出数据findName
     * @param all 待导出的数据
     * @param response /
     * @throws IOException /
     */
     void download(List<PatternConfigDto> all, HttpServletResponse response) throws IOException;
+
+    Boolean findName(String name, Dept dept);
 }

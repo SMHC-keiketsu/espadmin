@@ -1,15 +1,18 @@
 package me.smhc.modules.master.domain;
 
-import lombok.Data;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
+import lombok.Data;
+import me.smhc.modules.system.domain.Dept;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import javax.persistence.*;
-import javax.validation.constraints.*;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import org.hibernate.annotations.*;
-import java.sql.Timestamp;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.sql.Timestamp;
+
 
 /**
 * @author 布和
@@ -27,12 +30,14 @@ public class PatternConfig implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "dept_id",nullable = false)
-    @NotNull
-    private Long deptId;
+    @ManyToOne
+    @JoinColumn(name = "dept_id", referencedColumnName = "id")
+    private Dept dept;
+
+
 
     /** 同一部门内，名字不可重复 */
-    @Column(name = "name",nullable = false)
+    @Column(name = "[name]",nullable = false)
     @NotBlank
     private String name;
 
@@ -62,12 +67,10 @@ public class PatternConfig implements Serializable {
 
     /** 申告等種別コード */
     @Column(name = "icb",nullable = false)
-    @NotBlank
     private String icb;
 
     /** 大額・少額識別 */
     @Column(name = "ls",nullable = false)
-    @NotBlank
     private String ls;
 
     /** あて先官署コード */
@@ -132,57 +135,46 @@ public class PatternConfig implements Serializable {
 
     /** 孫混載表示 */
     @Column(name = "mkh",nullable = false)
-    @NotBlank
     private String mkh;
 
     /** 到着便名１ */
     @Column(name = "fl1",nullable = false)
-    @NotBlank
     private String fl1;
 
     /** 到着便名２ */
     @Column(name = "fl2",nullable = false)
-    @NotBlank
     private String fl2;
 
     /** 到着空港 */
     @Column(name = "pot",nullable = false)
-    @NotBlank
     private String pot;
 
     /** 仕出地 */
     @Column(name = "org",nullable = false)
-    @NotBlank
     private String org;
 
     /** ジョイント混載 */
     @Column(name = "jnt",nullable = false)
-    @NotBlank
     private String jnt;
 
     /** 特殊貨物記号 */
     @Column(name = "spc",nullable = false)
-    @NotBlank
     private String spc;
 
     /** 搬入保税蔵置場 */
     @Column(name = "ihw",nullable = false)
-    @NotBlank
     private String ihw;
 
     /** 仕向地 */
     @Column(name = "hch_dst",nullable = false)
-    @NotBlank
     private String hchDst;
 
     /** 税関官署 */
     @Column(name = "chc",nullable = false)
-    @NotBlank
     private String chc;
 
     /** 委託元混載業 */
     @Column(name = "ibb",nullable = false)
-    @NotBlank
     private String ibb;
 
     /** インボイス価格区分コード */
@@ -236,7 +228,7 @@ public class PatternConfig implements Serializable {
     private String in3;
 
     /** 原産地コード */
-    @Column(name = "or",nullable = false)
+    @Column(name = "[or]",nullable = false)
     @NotBlank
     private String or;
 
