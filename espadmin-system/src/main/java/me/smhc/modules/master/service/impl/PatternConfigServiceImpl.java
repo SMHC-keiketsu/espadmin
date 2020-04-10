@@ -118,4 +118,9 @@ public class PatternConfigServiceImpl implements PatternConfigService {
     public Boolean findName(String name, Dept dept) {
         return patternConfigRepository.findByNameAndDept(name,dept) != null ? false : true;
     }
+
+    @Override
+    public Boolean queryUpdateNaem(Long id, String name, Dept dept) {
+        return patternConfigRepository.findByIdAndNameAndDept(id,name,dept) != null ? false : true;
+    }
 }

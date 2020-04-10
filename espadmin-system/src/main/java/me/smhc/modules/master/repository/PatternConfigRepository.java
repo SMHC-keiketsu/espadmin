@@ -18,4 +18,12 @@ public interface PatternConfigRepository extends JpaRepository<PatternConfig, Lo
      * @return PatternConfig
      */
     PatternConfig findByNameAndDept(String name, Dept dept);
+    /**
+     * 查看更新的时候是否有名称
+     * @param id
+     * @param name
+     * @param dept
+     * @return PatternConfig
+     */
+    PatternConfig findByIdAndNameAndDept(Long id, String name,Dept dept);
 }

@@ -65,5 +65,20 @@ public interface PatternConfigService {
     */
     void download(List<PatternConfigDto> all, HttpServletResponse response) throws IOException;
 
+    /**
+     * 查询名称
+     * @param name
+     * @param dept
+     * @return
+     */
     Boolean findName(String name, Dept dept);
+
+    /**
+     * 查询更新的时候是否有名称
+     * @param id
+     * @param name
+     * @param dept
+     * @return
+     */
+    Boolean queryUpdateNaem(Long id, String name, Dept dept);
 }
