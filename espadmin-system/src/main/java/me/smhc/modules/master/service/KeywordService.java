@@ -4,6 +4,8 @@ import me.smhc.modules.master.domain.Keyword;
 import me.smhc.modules.master.service.dto.KeywordDto;
 import me.smhc.modules.master.service.dto.KeywordQueryCriteria;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+
 import java.util.Map;
 import java.util.List;
 import java.io.IOException;
@@ -63,4 +65,10 @@ public interface KeywordService {
     * @throws IOException /
     */
     void download(List<KeywordDto> all, HttpServletResponse response) throws IOException;
+
+    /**
+     * 全部のキーワード取得
+     * @return  キーワードリスト
+     */
+    List<String> findAllPorductName();
 }

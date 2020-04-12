@@ -22,6 +22,6 @@ public class PatternConfigQueryCriteria{
     @Query(type = Query.Type.BETWEEN)
     private List<Timestamp> updateTime;
 
-    @Query
-    private Dept dept;
+    @Query(propName = "id",joinName = "dept")
+    private Long deptId;
 }

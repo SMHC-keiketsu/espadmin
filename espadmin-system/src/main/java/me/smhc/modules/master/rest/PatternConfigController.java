@@ -78,6 +78,14 @@ public class PatternConfigController {
         return new ResponseEntity<>(patternConfigService.queryAll(criteria,pageable),HttpStatus.OK);
     }
 
+    @GetMapping(path = "/getPattrens")
+    @Log("查询pattern")
+    @ApiOperation("查询pattern")
+    @PreAuthorize("@el.check('patternConfig:list')")
+    public ResponseEntity<Object> getPatternConfigs(PatternConfigQueryCriteria criteria){
+        return new ResponseEntity<>(patternConfigService.queryAll(criteria),HttpStatus.OK);
+    }
+
     @PostMapping
     @Log("新增pattern")
     @ApiOperation("新增pattern")

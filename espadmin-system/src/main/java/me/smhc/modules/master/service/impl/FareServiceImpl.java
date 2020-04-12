@@ -165,4 +165,14 @@ public class FareServiceImpl implements FareService {
         }
         FileUtil.downloadExcel(list, response);
     }
+
+    @Override
+    public List<BigDecimal> findByDeptAndIsoAndWeightIsLessThanEqualOrderByWeightAsc(Long deptId, String iso, BigDecimal weight) {
+        return fareRepository.findPriceByDeptAndIsoAndWeight(deptId,iso,weight);
+    }
+
+    @Override
+    public List<BigDecimal> findHeightestPrice(Long deptId, String iso) {
+        return fareRepository.findHeightestPrice(deptId,iso);
+    }
 }

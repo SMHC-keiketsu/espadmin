@@ -4,6 +4,9 @@ import me.smhc.modules.master.domain.ExchangeRate;
 import me.smhc.modules.master.service.dto.ExchangeRateDto;
 import me.smhc.modules.master.service.dto.ExchangeRateQueryCriteria;
 import org.springframework.data.domain.Pageable;
+
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Map;
 import java.util.List;
 import java.io.IOException;
@@ -63,4 +66,12 @@ public interface ExchangeRateService {
     * @throws IOException /
     */
     void download(List<ExchangeRateDto> all, HttpServletResponse response) throws IOException;
+
+    /**
+     * 根据ISO和有效区间查找
+     * @param iso 通貨
+     * @param today　当日
+     * @return rate
+     */
+    BigDecimal findRateByIsoAndToday(String iso, String today);
 }

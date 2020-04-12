@@ -38,8 +38,8 @@ public class ManifestMawbController {
     @ApiOperation("导入Excel数据")
     @PostMapping(value = "/uploadExcel")
     @PreAuthorize("@el.check('manifest:add')")
-    public ResponseEntity<Object> create(@RequestParam Long deptId, @RequestParam("file") MultipartFile file){
-        return new ResponseEntity<>(manifestMawbService.create(deptId, file),HttpStatus.CREATED);
+    public ResponseEntity<Object> create(@RequestParam Long deptId,@RequestParam Long patternId, @RequestParam("file") MultipartFile file){
+        return new ResponseEntity<>(manifestMawbService.create(deptId, patternId, file),HttpStatus.CREATED);
     }
 
     @Log("导出数据")
@@ -84,5 +84,14 @@ public class ManifestMawbController {
     public ResponseEntity<Object> deleteAll(@RequestBody Long[] ids) {
         manifestMawbService.deleteAll(ids);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/calculateCif")
+    @Log("CIF計算")
+    @ApiOperation("CIF計算")
+    @PreAuthorize("@el.check('manifest:edit')")
+    public ResponseEntity<Object> calculateCif(@RequestBody Long id){
+        manifestMawbService.calculateCIF(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

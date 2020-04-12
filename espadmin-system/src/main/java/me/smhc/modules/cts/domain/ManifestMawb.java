@@ -77,6 +77,7 @@ public class ManifestMawb implements Serializable {
     /** mic amount **/
     @Column(name="mic_amount")
     private Long micAmount;
+
     /** mic left amount **/
     @Column(name = "mic_left_amount")
     private Long micLeftAmount;
@@ -84,9 +85,102 @@ public class ManifestMawb implements Serializable {
     /** hch amount **/
     @Column(name="hch_amount")
     private Long hchAmount;
+
     /** hch left amount **/
     @Column(name = "hch_left_amount")
     private Long hchLeftAmount;
+
+    /** 申告条件 */
+    @Column(name = "jyo")
+    private String jyo;
+
+    /** 申告先種別コード */
+    @Column(name = "ic1")
+    private String ic1;
+
+    /** 申告等種別コード */
+    @Column(name = "icb")
+    private String icb;
+
+    /** 大額・少額識別 */
+    @Column(name = "ls")
+    private String ls;
+
+    /** あて先官署コード */
+    @Column(name = "ch")
+    private String ch;
+
+    /** あて先部門コード */
+    @Column(name = "chb")
+    private String chb;
+
+    /** 申告等予定年月日 */
+    @Column(name = "icd")
+    private String icd;
+
+    /** 積載船（機）名 */
+    @Column(name = "vsn")
+    private String vsn;
+
+    /** 入港年月日 */
+    @Column(name = "arr")
+    private String arr;
+
+    /** 船（取）卸港コード */
+    @Column(name = "dst")
+    private String dst;
+
+    /** 積出地コード */
+    @Column(name = "psc")
+    private String psc;
+
+    /** 通関予定蔵置場コード */
+    @Column(name = "st")
+    private String st;
+
+    /** 孫混載表示 */
+    @Column(name = "mkh")
+    private String mkh;
+
+    /** 税関官署 */
+    @Column(name = "chc")
+    private String chc;
+
+    /** 委託元混載業 */
+    @Column(name = "ibb")
+    private String ibb;
+
+    /** 到着便名１ */
+    @Column(name = "fl1")
+    private String fl1;
+
+    /** 到着便名２ */
+    @Column(name = "fl2")
+    private String fl2;
+
+    /** 到着空港 */
+    @Column(name = "pot")
+    private String pot;
+
+    /** 仕出地 */
+    @Column(name = "org")
+    private String org;
+
+    /** ジョイント混載 */
+    @Column(name = "jnt")
+    private String jnt;
+
+    /** 特殊貨物記号 */
+    @Column(name = "spc")
+    private String spc;
+
+    /** 仕向地 */
+    @Column(name = "hch_dst")
+    private String hchDst;
+
+    /** 搬入保税蔵置場 */
+    @Column(name = "ihw")
+    private String ihw;
 
     /** 数据版本号 乐观锁*/
     @Version

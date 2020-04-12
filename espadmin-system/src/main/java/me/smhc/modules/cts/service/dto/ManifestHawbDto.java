@@ -43,6 +43,9 @@ public class ManifestHawbDto implements Serializable {
     /** 品名 */
     private String productName;
 
+    /** インボイス価格区分コード */
+    private String invoiceClassificationCode;
+
     /** インボイス価格条件コード */
     private String invoiceConditionCode;
 
@@ -60,6 +63,9 @@ public class ManifestHawbDto implements Serializable {
 
     /** 運賃金額 */
     private BigDecimal fareValue;
+
+    /** 保険区分コード */
+    private String insuranceClassificationCode;
 
     /** 保険通貨 */
     private String insuranceIso;
@@ -144,6 +150,18 @@ public class ManifestHawbDto implements Serializable {
 
     /** 着払い金額 */
     private BigDecimal cashOnDeliveryAmount;
+
+    /** 課税価格 */
+    private BigDecimal dpr;
+
+    /** 記事 */
+    private String nt1;
+
+    /** 荷主セクションコード */
+    private String nsc;
+
+    /** 荷主リファレンスナンバー */
+    private String nrn;
 
     /**ida type **/
     private Integer idaType;

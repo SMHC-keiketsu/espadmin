@@ -63,4 +63,11 @@ public interface TariffService {
     * @throws IOException /
     */
     void download(List<TariffDto> all, HttpServletResponse response) throws IOException;
+
+    /**
+     * 根据官署コード、ISOより税関
+     * @param governmentCode　官署コード
+     * @return  税関
+     */
+    TariffDto findByGovernmentCode(String governmentCode);
 }

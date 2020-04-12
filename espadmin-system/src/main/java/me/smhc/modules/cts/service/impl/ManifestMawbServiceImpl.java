@@ -1,6 +1,8 @@
 package me.smhc.modules.cts.service.impl;
 
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.poi.excel.ExcelReader;
@@ -15,6 +17,13 @@ import me.smhc.modules.cts.service.dto.ManifestMawbQueryCriteria;
 import me.smhc.modules.cts.service.mapper.ManifestMawbMapper;
 import me.smhc.modules.master.domain.Agency;
 import me.smhc.modules.master.domain.ExcelConfig;
+import me.smhc.modules.master.domain.Keyword;
+import me.smhc.modules.master.domain.Tariff;
+import me.smhc.modules.master.service.*;
+import me.smhc.modules.master.service.dto.KeywordDto;
+import me.smhc.modules.master.service.dto.KeywordQueryCriteria;
+import me.smhc.modules.master.service.dto.PatternConfigDto;
+import me.smhc.modules.master.service.dto.TariffDto;
 import me.smhc.modules.system.domain.Dept;
 import me.smhc.modules.system.service.DeptService;
 import me.smhc.modules.system.service.UserService;
@@ -24,6 +33,7 @@ import me.smhc.utils.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +42,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 // 默认不使用缓存
@@ -56,17 +67,35 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
 
     private final DeptService deptService;
 
+    private final PatternConfigService patternConfigDtoService;
+
+    private final TariffService tariffService;
+
+    private final ExchangeRateService exchangeRateService;
+
+    private final FareService fareService;
+
+    private final KeywordService keywordService;
+
+    private final ImporterService importerService;
+
     @Value("${file.path}")
     private String path;
 
     @Value("${file.maxSize}")
     private long maxSize;
 
-    public ManifestMawbServiceImpl(ManifestMawbRepository manifestMawbRepository, ManifestMawbMapper manifestMawbMapper, UserService userService, DeptService deptService) {
+    public ManifestMawbServiceImpl(ManifestMawbRepository manifestMawbRepository, ManifestMawbMapper manifestMawbMapper, UserService userService, DeptService deptService, PatternConfigService patternConfigDtoService, TariffService tariffService, ExchangeRateService exchangeRateService, FareService fareService, KeywordService keywordService, ImporterService importerService) {
         this.manifestMawbRepository = manifestMawbRepository;
         this.manifestMawbMapper = manifestMawbMapper;
         this.userService = userService;
         this.deptService = deptService;
+        this.patternConfigDtoService = patternConfigDtoService;
+        this.tariffService = tariffService;
+        this.exchangeRateService = exchangeRateService;
+        this.fareService = fareService;
+        this.keywordService = keywordService;
+        this.importerService = importerService;
     }
 
     @Override
@@ -105,14 +134,20 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
     }
 
     @Override
+    //@CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
-    public Boolean create(Long deptId, MultipartFile multipartFile) {
+    public Boolean create(Long deptId, Long patternId, MultipartFile multipartFile) {
         // check File Size
         FileUtil.checkSize(maxSize, multipartFile.getSize());
 
         // if Agency dept is not setted
         if(ObjectUtil.isNull(deptId)){
             throw new BadRequestException("代理店不能为空");
+        }
+        // if Pattern is not setted
+        if(ObjectUtil.isNull(patternId))
+        {
+            throw new BadRequestException("代理店的Pattern不能为空");
         }
 
         ExcelReader reader = ExcelUtil.getReader(FileUtil.toFile(multipartFile));
@@ -126,139 +161,266 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
             DeptDto deptDto = deptService.findById(deptId);
             Agency agency = deptDto.getAgency();
             ExcelConfig excelConfig = agency.getExcelConfig();
-
+            // get pattern config
+            PatternConfigDto patternConfigDto = patternConfigDtoService.findById(patternId);
+            // データ解析
             if(ObjectUtil.isNotNull(excelConfig.getMainFestExcel())){
                 JSONObject jsonObject =  new JSONObject(excelConfig.getMainFestExcel());
                 Map<String,ManifestMawb> manifestMawbMap = new HashMap<>();
                 for (Map<String,Object> row: readAll) {
-                    if(ObjectUtil.isNull(manifestMawbMap) || !manifestMawbMap.containsKey(row.get(jsonObject.getStr("mawbNo")).toString())) {
+                    if(ObjectUtil.isNull(manifestMawbMap) || !manifestMawbMap.containsKey(row.get(jsonObject.getStr("mawbNo")).toString().trim())) {
                         ManifestMawb manifestMawb = new ManifestMawb();
                         Dept dept = new Dept();
                         dept.setId(deptId);
                         manifestMawb.setDept(dept);
-                        manifestMawb.setMawbNo(row.get(jsonObject.getStr("mawbNo")).toString());
-                        manifestMawb.setFlightNo(row.get(jsonObject.getStr("flightNo")).toString());
-                        Date date = DateUtil.parse(row.get(jsonObject.getStr("flightDate")).toString());
+                        manifestMawb.setMawbNo(row.get(jsonObject.getStr("mawbNo")).toString().trim());
+                        manifestMawb.setFlightNo(row.get(jsonObject.getStr("flightNo")).toString().trim());
+                        Date date = DateUtil.parse(row.get(jsonObject.getStr("flightDate")).toString().trim());
                         manifestMawb.setFlightDate(date);
+                        // IDA,MIC Default Config
+                        manifestMawb.setJyo(patternConfigDto.getJyo());
+                        manifestMawb.setIc1(patternConfigDto.getIc1());
+                        manifestMawb.setIcb(patternConfigDto.getIcb());
+                        manifestMawb.setLs(patternConfigDto.getLs());
+                        manifestMawb.setCh(patternConfigDto.getCh());
+                        manifestMawb.setChb(patternConfigDto.getChb());
+                        manifestMawb.setIcd(patternConfigDto.getIcd());
+                        manifestMawb.setVsn(patternConfigDto.getVsn());
+                        manifestMawb.setArr(patternConfigDto.getArr());
+                        manifestMawb.setDst(patternConfigDto.getDst());
+                        manifestMawb.setPsc(patternConfigDto.getPsc());
+                        manifestMawb.setSt(patternConfigDto.getSt());
+                        // HCH Default Config
+                        manifestMawb.setMkh(patternConfigDto.getMkh());
+                        manifestMawb.setChc(patternConfigDto.getChc());
+                        manifestMawb.setIbb(patternConfigDto.getIbb());
+                        manifestMawb.setFl1(patternConfigDto.getFl1());
+                        manifestMawb.setFl2(patternConfigDto.getFl2());
+                        manifestMawb.setPot(patternConfigDto.getPot());
+                        manifestMawb.setOrg(patternConfigDto.getOrg());
+                        manifestMawb.setJnt(patternConfigDto.getJnt());
+                        manifestMawb.setSpc(patternConfigDto.getSpc());
+                        manifestMawb.setHchDst(patternConfigDto.getHchDst());
+                        manifestMawb.setIhw(patternConfigDto.getIhw());
+
+                        // hawbList
                         List<ManifestHawb> manifestHawbList = new ArrayList<>();
                         manifestMawb.setManifestHawbList(manifestHawbList);
+                        // set status
+                        manifestMawb.setStatus("1");
+                        // set map
                         manifestMawbMap.put(manifestMawb.getMawbNo(),manifestMawb);
                     }
                     ManifestHawb manifestHawb = new ManifestHawb();
-                    manifestHawb.setHawbNo(row.get(jsonObject.getStr("hawbNo")).toString());
-                    manifestHawb.setPcs(Integer.parseInt(row.get(jsonObject.getStr("pcs")).toString()));
-                    manifestHawb.setWeight(new BigDecimal(row.get(jsonObject.getStr("weight")).toString()));
-                    manifestHawb.setWeightCode(row.get(jsonObject.getStr("weightCode")).toString());
-                    manifestHawb.setProductName(row.get(jsonObject.getStr("productName")).toString());
+                    manifestHawb.setHawbNo(row.get(jsonObject.getStr("hawbNo")).toString().trim());
+                    manifestHawb.setPcs(Integer.parseInt(row.get(jsonObject.getStr("pcs")).toString().trim()));
+                    manifestHawb.setWeight(new BigDecimal(row.get(jsonObject.getStr("weight")).toString().trim()));
+                    manifestHawb.setWeightCode(row.get(jsonObject.getStr("weightCode")).toString().trim().toUpperCase());
+                    manifestHawb.setProductName(row.get(jsonObject.getStr("productName")).toString().trim().toUpperCase());
+                    /* インボイス価格区分コード */
+                    manifestHawb.setInvoiceClassificationCode(patternConfigDto.getIp1());
+                    /* インボイス価格条件コード */
                     if(jsonObject.getStr("invoiceConditionCode") != null){
-                        manifestHawb.setInvoiceConditionCode(row.get(jsonObject.getStr("invoiceConditionCode")).toString());
+                        manifestHawb.setInvoiceConditionCode(row.get(jsonObject.getStr("invoiceConditionCode")).toString().trim().toUpperCase());
+                    }else {
+                        manifestHawb.setInvoiceConditionCode(patternConfigDto.getIp2());
                     }
+                    /* インボイス通貨コード */
                     if(jsonObject.getStr("invoiceConditionCode") != null) {
-                        manifestHawb.setInvoiceIso(row.get(jsonObject.getStr("invoiceIso")).toString());
+                        manifestHawb.setInvoiceIso(row.get(jsonObject.getStr("invoiceIso")).toString().trim().toUpperCase());
+                    }else {
+                        manifestHawb.setInvoiceIso(patternConfigDto.getIp3());
                     }
+                    /* インボイス価格 */
                     if(jsonObject.getStr("invoiceValue") != null) {
-                        manifestHawb.setInsuranceValue(new BigDecimal(row.get(jsonObject.getStr("invoiceValue")).toString()));
+                        manifestHawb.setInvoiceValue(new BigDecimal(row.get(jsonObject.getStr("invoiceValue")).toString().trim()));
+                    }else {
+                        manifestHawb.setInvoiceValue(new BigDecimal(patternConfigDto.getIp4()));
                     }
+                    // Set default Value
+                    if(ObjectUtil.isEmpty(manifestHawb.getInvoiceValue())){
+                        manifestHawb.setInvoiceValue(new BigDecimal(0));
+                    }
+                    /* 運賃区分コード */
                     if(jsonObject.getStr("fareClassificationCode") != null) {
-                        manifestHawb.setFareClassificationCode(row.get(jsonObject.getStr("fareClassificationCode")).toString());
+                        manifestHawb.setFareClassificationCode(row.get(jsonObject.getStr("fareClassificationCode")).toString().trim().toUpperCase());
+                    }else {
+                        manifestHawb.setFareClassificationCode(patternConfigDto.getFr1());
                     }
+                    /* 運賃通貨コード */
                     if(jsonObject.getStr("fareIso") != null) {
-                        manifestHawb.setFareIso(row.get(jsonObject.getStr("fareIso")).toString());
+                        manifestHawb.setFareIso(row.get(jsonObject.getStr("fareIso")).toString().trim().toUpperCase());
+                    }else {
+                        manifestHawb.setFareIso(patternConfigDto.getFr2());
                     }
+                    /* 運賃 */
                     if(jsonObject.getStr("fareValue") != null) {
-                        manifestHawb.setFareValue(new BigDecimal(row.get(jsonObject.getStr("fareValue")).toString()));
+                        manifestHawb.setFareValue(new BigDecimal(row.get(jsonObject.getStr("fareValue")).toString().trim()));
+                    }else {
+                        manifestHawb.setFareValue(new BigDecimal(patternConfigDto.getFr3()));
                     }
+                    // Set default Value
+                    if(ObjectUtil.isEmpty(manifestHawb.getFareValue())){
+                        manifestHawb.setFareValue(new BigDecimal(0));
+                    }
+
+                    /* 保険区分コード */
+                    manifestHawb.setInsuranceClassificationCode(patternConfigDto.getIn1());
+
+                    /* 保険通貨コード */
                     if(jsonObject.getStr("insuranceIso") != null) {
-                        manifestHawb.setInsuranceIso(row.get(jsonObject.getStr("insuranceIso")).toString());
+                        manifestHawb.setInsuranceIso(row.get(jsonObject.getStr("insuranceIso")).toString().trim().toUpperCase());
+                    }else{
+                        manifestHawb.setInsuranceIso(patternConfigDto.getIn2());
                     }
+                    /* 保険金額 */
                     if(jsonObject.getStr("insuranceValue") != null) {
-                        manifestHawb.setInsuranceValue(new BigDecimal(row.get(jsonObject.getStr("insuranceValue")).toString()));
+                        manifestHawb.setInsuranceValue(new BigDecimal(row.get(jsonObject.getStr("insuranceValue")).toString().trim()));
+                    }else {
+                        manifestHawb.setInsuranceValue(new BigDecimal(patternConfigDto.getIn3()));
                     }
+                    // Set default Value
+                    if(ObjectUtil.isEmpty(manifestHawb.getInsuranceValue())){
+                        manifestHawb.setInsuranceValue(new BigDecimal(0));
+                    }
+
                     if(jsonObject.getStr("importerName") != null) {
-                        manifestHawb.setImporterName(row.get(jsonObject.getStr("importerName")).toString());
+                        manifestHawb.setImporterName(row.get(jsonObject.getStr("importerName")).toString().trim().toUpperCase());
                     }
                     if(jsonObject.getStr("importerPosterCode") != null) {
-                        manifestHawb.setImporterPosterCode(row.get(jsonObject.getStr("importerPosterCode")).toString());
+                        manifestHawb.setImporterPosterCode(row.get(jsonObject.getStr("importerPosterCode")).toString().trim());
                     }
                     if(jsonObject.getStr("importerTel") != null) {
-                        manifestHawb.setImporterTel(row.get(jsonObject.getStr("importerTel")).toString());
+                        manifestHawb.setImporterTel(row.get(jsonObject.getStr("importerTel")).toString().trim());
                     }
+                    if(jsonObject.getStr("importerAddrAll") != null){
+                        manifestHawb.setImporterAddrAll(row.get(jsonObject.getStr("importerAddrAll")).toString().trim());
+                    }
+
                     if(jsonObject.getStr("importerAddr1") != null) {
-                        manifestHawb.setImporterAddr1(row.get(jsonObject.getStr("importerAddr1")).toString());
+                        manifestHawb.setImporterAddr1(row.get(jsonObject.getStr("importerAddr1")).toString().trim());
                     }
                     if(jsonObject.getStr("importerAddr2") != null) {
-                        manifestHawb.setImporterAddr2(row.get(jsonObject.getStr("importerAddr2")).toString());
+                        manifestHawb.setImporterAddr2(row.get(jsonObject.getStr("importerAddr2")).toString().trim());
                     }
                     if(jsonObject.getStr("importerAddr3") != null) {
-                        manifestHawb.setImporterAddr3(row.get(jsonObject.getStr("importerAddr3")).toString());
+                        manifestHawb.setImporterAddr3(row.get(jsonObject.getStr("importerAddr3")).toString().trim());
                     }
                     if(jsonObject.getStr("importerAddr4") != null) {
-                        manifestHawb.setImporterAddr4(row.get(jsonObject.getStr("importerAddr4")).toString());
+                        manifestHawb.setImporterAddr4(row.get(jsonObject.getStr("importerAddr4")).toString().trim());
                     }
                     if(jsonObject.getStr("shipperName") != null) {
-                        manifestHawb.setShipperName(row.get(jsonObject.getStr("shipperName")).toString());
+                        manifestHawb.setShipperName(row.get(jsonObject.getStr("shipperName")).toString().trim());
                     }
                     if(jsonObject.getStr("shipperPosterCode") != null) {
-                        manifestHawb.setShipperPosterCode(row.get(jsonObject.getStr("shipperPosterCode")).toString());
+                        manifestHawb.setShipperPosterCode(row.get(jsonObject.getStr("shipperPosterCode")).toString().trim());
                     }
                     if(jsonObject.getStr("shipperTel") != null) {
-                        manifestHawb.setShipperTel(row.get(jsonObject.getStr("shipperTel")).toString());
+                        manifestHawb.setShipperTel(row.get(jsonObject.getStr("shipperTel")).toString().trim());
                     }
                     if(jsonObject.getStr("shipperAddrAll") != null) {
-                        manifestHawb.setShipperAddrAll(row.get(jsonObject.getStr("shipperAddrAll")).toString());
+                        manifestHawb.setShipperAddrAll(row.get(jsonObject.getStr("shipperAddrAll")).toString().trim());
                     }
+                    /* 原産地コード */
                     if(jsonObject.getStr("origin") != null) {
-                        manifestHawb.setOrigin(row.get(jsonObject.getStr("origin")).toString());
+                        manifestHawb.setOrigin(row.get(jsonObject.getStr("origin")).toString().trim());
+                    }else {
+                        manifestHawb.setOrigin(patternConfigDto.getOr());
                     }
                     if(jsonObject.getStr("trackingNo") != null) {
-                        manifestHawb.setTrackingNo(row.get(jsonObject.getStr("trackingNo")).toString());
+                        manifestHawb.setTrackingNo(row.get(jsonObject.getStr("trackingNo")).toString().trim());
                     }
-                    if(jsonObject.getStr("deliveryPosterCode") != null) {
-                        manifestHawb.setDeliveryPosterCode(row.get(jsonObject.getStr("deliveryPosterCode")).toString());
-                    }
+
+                    /* 納品先名 */
                     if(jsonObject.getStr("deliveryDestination") != null) {
-                        manifestHawb.setDeliveryDestination(row.get(jsonObject.getStr("deliveryDestination")).toString());
+
+                        manifestHawb.setDeliveryDestination(row.get(jsonObject.getStr("deliveryDestination")).toString().trim());
+
+                        if(jsonObject.getStr("deliveryTel") != null) {
+                            manifestHawb.setDeliveryTel(row.get(jsonObject.getStr("deliveryTel")).toString().trim());
+                        }
+                        if(jsonObject.getStr("deliveryPosterCode") != null) {
+                            manifestHawb.setDeliveryPosterCode(row.get(jsonObject.getStr("deliveryPosterCode")).toString().trim());
+                        }
+                        if(jsonObject.getStr("deliveryAddrAll") != null) {
+                            manifestHawb.setDeliveryAddrAll(row.get(jsonObject.getStr("deliveryAddrAll")).toString().trim());
+                        }
+                        if(jsonObject.getStr("deliveryAddr1") != null) {
+                            manifestHawb.setDeliveryAddr1(row.get(jsonObject.getStr("deliveryAddr1")).toString().trim());
+                        }
+                        if(jsonObject.getStr("deliveryAddr2") != null) {
+                            manifestHawb.setDeliveryAddr2(row.get(jsonObject.getStr("deliveryAddr2")).toString().trim());
+                        }
+                        if(jsonObject.getStr("deliveryAddr3") != null) {
+                            manifestHawb.setDeliveryAddr3(row.get(jsonObject.getStr("deliveryAddr3")).toString().trim());
+                        }
+                        if(jsonObject.getStr("deliveryAddr4") != null) {
+                            manifestHawb.setDeliveryAddr4(row.get(jsonObject.getStr("deliveryAddr4")).toString().trim());
+                        }
                     }
-                    if(jsonObject.getStr("deliveryTel") != null) {
-                        manifestHawb.setDeliveryTel(row.get(jsonObject.getStr("deliveryTel")).toString());
+                    // 納品先がない場合、輸入者の情報をコッピーします
+                    if(ObjectUtil.isEmpty(manifestHawb.getDeliveryDestination())){
+                        manifestHawb.setDeliveryDestination(manifestHawb.getImporterName());
+                        manifestHawb.setDeliveryPosterCode(manifestHawb.getImporterPosterCode());
+                        manifestHawb.setDeliveryTel(manifestHawb.getImporterTel());
+                        manifestHawb.setDeliveryAddrAll(manifestHawb.getImporterAddrAll());
+                        manifestHawb.setDeliveryAddr1(manifestHawb.getImporterAddr1());
+                        manifestHawb.setDeliveryAddr2(manifestHawb.getImporterAddr2());
+                        manifestHawb.setDeliveryAddr3(manifestHawb.getImporterAddr3());
+                        manifestHawb.setDeliveryAddr4(manifestHawb.getImporterAddr4());
                     }
+                    /* 納品先担当者/配送業者 */
                     if(jsonObject.getStr("deliveryContact") != null) {
-                        manifestHawb.setDeliveryContact(row.get(jsonObject.getStr("deliveryContact")).toString());
-                    }
-                    if(jsonObject.getStr("deliveryAddrAll") != null) {
-                        manifestHawb.setDeliveryAddrAll(row.get(jsonObject.getStr("deliveryAddrAll")).toString());
-                    }
-                    if(jsonObject.getStr("deliveryAddr1") != null) {
-                        manifestHawb.setDeliveryAddr1(row.get(jsonObject.getStr("deliveryAddr1")).toString());
-                    }
-                    if(jsonObject.getStr("deliveryAddr2") != null) {
-                        manifestHawb.setDeliveryAddr2(row.get(jsonObject.getStr("deliveryAddr2")).toString());
-                    }
-                    if(jsonObject.getStr("deliveryAddr3") != null) {
-                        manifestHawb.setDeliveryAddr3(row.get(jsonObject.getStr("deliveryAddr3")).toString());
-                    }
-                    if(jsonObject.getStr("deliveryAddr4") != null) {
-                        manifestHawb.setDeliveryAddr4(row.get(jsonObject.getStr("deliveryAddr4")).toString());
+                        manifestHawb.setDeliveryContact(row.get(jsonObject.getStr("deliveryContact")).toString().trim());
                     }
                     if(jsonObject.getStr("billingMethod") != null) {
-                        manifestHawb.setBillingMethod(row.get(jsonObject.getStr("billingMethod")).toString());
+                        manifestHawb.setBillingMethod(row.get(jsonObject.getStr("billingMethod")).toString().trim());
                     }
                     if(jsonObject.getStr("packaging") != null) {
-                        manifestHawb.setPackaging(row.get(jsonObject.getStr("packaging")).toString());
+                        manifestHawb.setPackaging(row.get(jsonObject.getStr("packaging")).toString().trim());
                     }
                     if(jsonObject.getStr("cashOnDeliveryAmount") != null) {
-                        manifestHawb.setCashOnDeliveryAmount(new BigDecimal(row.get(jsonObject.getStr("cashOnDeliveryAmount")).toString()));
+                        manifestHawb.setCashOnDeliveryAmount(new BigDecimal(row.get(jsonObject.getStr("cashOnDeliveryAmount")).toString().trim()));
                     }
+                    /* 課税価格 CIF */
+                    manifestHawb.setDpr( NumberUtil.round(new BigDecimal(patternConfigDto.getDpr()),2,RoundingMode.HALF_UP));
+                    // Set Default Value
+                    if(ObjectUtil.isEmpty(manifestHawb.getDpr())){
+                        manifestHawb.setDpr(new BigDecimal(0));
+                    }
+                    /* 記事 */
+                    manifestHawb.setNt1(patternConfigDto.getNt1());
+                    /* 荷主セクションコード */
+                    manifestHawb.setNsc(patternConfigDto.getNsc());
+                    /* 荷主リファレンスナンバー */
+                    manifestHawb.setNrn(patternConfigDto.getNrn());
+
+                    /* Createor ID **/
                     manifestHawb.setCreateUserId(userDto.getId());
                     manifestHawb.setUpdateUserId(userDto.getId());
                     // add to manifestHawb List
-                    manifestMawbMap.get(row.get(jsonObject.getStr("mawbNo")).toString()).getManifestHawbList().add(manifestHawb);
+                    manifestMawbMap.get(row.get(jsonObject.getStr("mawbNo")).toString().trim()).getManifestHawbList().add(manifestHawb);
 
                 }
                 // save manifest data
+                List<String> errMawbNo = new ArrayList<>();
+
                 if(ObjectUtil.isNotNull(manifestMawbMap)){
                     for(String key:manifestMawbMap.keySet()){
-                        manifestMawbRepository.save(manifestMawbMap.get(key));
+                        ManifestMawb temp = manifestMawbRepository.findByMawbNo(key);
+                        // 主单不存在或主单未开始受托
+                        if(ObjectUtil.isNull(temp) || Integer.parseInt(temp.getStatus()) < 2  ){
+                            if(ObjectUtil.isNotNull(temp)){
+                                // 先删除然后插入
+                                manifestMawbRepository.deleteById(temp.getId());
+                            }
+                            manifestMawbRepository.save(manifestMawbMap.get(key));
+                        }else {
+                            errMawbNo.add(key);
+                        }
+                    }
+                    if(ObjectUtil.isNotEmpty(errMawbNo)){
+                        throw new BadRequestException( "mawbNo:"+ errMawbNo.toString() +"のデータは受託開始以上の状態ですのでインポートできませんでした");
                     }
                 }
                 return true;
@@ -274,10 +436,14 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
     //@CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void update(ManifestMawb resources) {
-        ManifestMawb ManifestMawb = manifestMawbRepository.findById(resources.getId()).orElseGet(ManifestMawb::new);
-        ValidationUtil.isNull( ManifestMawb.getId(),"Manifest","id",resources.getId());
-        ManifestMawb.copy(resources);
-        manifestMawbRepository.save(ManifestMawb);
+        ManifestMawb manifestMawb = manifestMawbRepository.findById(resources.getId()).orElseGet(ManifestMawb::new);
+        ValidationUtil.isNull( manifestMawb.getId(),"Manifest","id",resources.getId());
+        // 更新対象のデータを取得する際にも、バージョンのチェックを行うこと
+        if(!manifestMawb.getReserve1().equals(resources.getReserve1())){
+            throw new ObjectOptimisticLockingFailureException(ManifestHawb.class,"mawb:" + resources.getMawbNo()+"数据并发");
+        }
+        manifestMawb.copy(resources);
+        manifestMawbRepository.save(manifestMawb);
     }
 
     @Override
@@ -302,6 +468,7 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
             map.put("重量", manifestMawb.getWeight());
             map.put("重量コード", manifestMawb.getWeightCode());
             map.put("品名", manifestMawb.getProductName());
+            map.put("インボイス価格区分コード", manifestMawb.getInvoiceConditionCode());
             map.put("インボイス価格条件コード", manifestMawb.getInvoiceConditionCode());
             map.put("INVOICE通貨 CURRENCY", manifestMawb.getInvoiceIso());
             map.put("INVOICE金額 DECLARED VALUE OF CUSTOMS", manifestMawb.getInvoiceValue());
@@ -340,4 +507,248 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
         }
         FileUtil.downloadExcel(list, response);
     }
+
+    @Override
+    //@CacheEvict(allEntries = true)
+    @Transactional(rollbackFor = Exception.class)
+    public void calculateCIF(Long manifestMawbId) {
+        // manifestMawb取得
+        ManifestMawb manifestMawb = manifestMawbRepository.findById(manifestMawbId).orElseGet(ManifestMawb::new);
+        ValidationUtil.isNull(manifestMawb.getId(),"Manifest","id",manifestMawbId);
+        if(ObjectUtil.isNotEmpty(manifestMawb.getManifestHawbList())){
+            // 税関取得
+            TariffDto tariffDto = tariffService.findByGovernmentCode(manifestMawb.getCh());
+            // キーワード取得
+            List<String> keywordList = keywordService.findAllPorductName();
+            Long idaAmount = Long.parseLong("0");
+            Long micAmount = Long.parseLong("0");
+            for(ManifestHawb temp: manifestMawb.getManifestHawbList()){
+                //INVの円貨算出
+                BigDecimal invYenka = this.getINVYENKA(temp.getInvoiceIso(),temp.getInvoiceValue());
+                //運賃算出
+                BigDecimal frtValue = this.getFRTVALUE(manifestMawb.getDept().getId(),temp.getFareIso(),temp.getWeight(),temp.getFareValue());
+                temp.setFareValue(frtValue);
+                //運賃円貨
+                BigDecimal frtYenka = this.getFRTYENKA(temp.getInvoiceConditionCode(),temp.getFareIso(),temp.getFareValue());
+                // インボイス価格条件FOB以外の時運賃欄をブランクする
+                if(temp.getInvoiceConditionCode().equals("C&F") || temp.getInvoiceConditionCode().equals("CIF")){
+                    temp.setFareClassificationCode("");
+                    temp.setFareIso("");
+                    temp.setFareValue(new BigDecimal(0));
+                }
+                //保険算出
+                BigDecimal insYenka = new BigDecimal(0);
+                if(temp.getInsuranceClassificationCode().equals("A") && NumberUtil.equals(temp.getInsuranceValue(),new BigDecimal(0))){
+                    temp.setInsuranceIso("JPY");
+                    if(NumberUtil.isLessOrEqual(invYenka,new BigDecimal(1000000))){
+                        temp.setInsuranceValue(new BigDecimal(3000));
+                        insYenka = new BigDecimal(3000);
+                    }else {
+                        BigDecimal insValue = NumberUtil.mul(NumberUtil.add(invYenka,frtYenka),new BigDecimal(0.003));
+                        temp.setInsuranceValue(NumberUtil.round(insValue,0));
+                        insYenka = temp.getInsuranceValue();
+                    }
+                }
+                // INSの円貨算出
+                insYenka = this.getINSYENKA(temp.getInsuranceIso(),temp.getInsuranceValue());
+
+                // CIF算出
+                BigDecimal cifValue = NumberUtil.add(invYenka,frtYenka,insYenka);
+                temp.setDpr(NumberUtil.round(cifValue,0));
+
+                // 申告タイプ判定
+                if(ObjectUtil.isNotNull(tariffDto)){
+                    // iso 以下、重量以下
+                    if(tariffDto.getCifLogic().equals(false) && tariffDto.getWeightLogic().equals(false)){
+                        if(NumberUtil.isLessOrEqual(temp.getDpr(),tariffDto.getCifValue()) && NumberUtil.isLessOrEqual(temp.getWeight(),tariffDto.getWeightAmount())){
+                            if(!keywordList.contains(temp.getProductName())){
+                                temp.setMicType(1);
+                                temp.setIdaType(0);
+                                temp.setHchType(1);
+                                micAmount++;
+                            }else {
+                                temp.setIdaType(1);
+                                temp.setHchType(1);
+                                temp.setMicType(0);
+                                idaAmount++;
+                            }
+                        }else {
+                            temp.setIdaType(1);
+                            temp.setHchType(1);
+                            temp.setMicType(0);
+                            idaAmount++;
+                        }
+                    }else if(tariffDto.getCifLogic().equals(false) && tariffDto.getWeightLogic().equals(true)){
+                        if(NumberUtil.isLessOrEqual(temp.getDpr(),tariffDto.getCifValue()) && NumberUtil.isGreaterOrEqual(temp.getWeight(),tariffDto.getWeightAmount())){
+                            if(!keywordList.contains(temp.getProductName())){
+                                temp.setMicType(1);
+                                temp.setIdaType(0);
+                                temp.setHchType(1);
+                                micAmount++;
+                            }else {
+                                temp.setIdaType(1);
+                                temp.setHchType(1);
+                                temp.setMicType(0);
+                                idaAmount++;
+                            }
+                        }else {
+                            temp.setIdaType(1);
+                            temp.setHchType(1);
+                            temp.setMicType(0);
+                            idaAmount++;
+                        }
+                    }else if(tariffDto.getCifLogic().equals(true) && tariffDto.getWeightLogic().equals(false)){
+                        if(NumberUtil.isGreaterOrEqual(temp.getDpr(),tariffDto.getCifValue()) && NumberUtil.isLessOrEqual(temp.getWeight(),tariffDto.getWeightAmount())){
+                            if(!keywordList.contains(temp.getProductName())){
+                                temp.setMicType(1);
+                                temp.setIdaType(0);
+                                temp.setHchType(1);
+                                micAmount++;
+                            }else {
+                                temp.setIdaType(1);
+                                temp.setHchType(1);
+                                temp.setMicType(0);
+                                idaAmount++;
+                            }
+                        }else {
+                            temp.setIdaType(1);
+                            temp.setHchType(1);
+                            temp.setMicType(0);
+                            idaAmount++;
+                        }
+                    }else {
+                        if(NumberUtil.isGreaterOrEqual(temp.getDpr(),tariffDto.getCifValue()) && NumberUtil.isGreaterOrEqual(temp.getWeight(),tariffDto.getWeightAmount())){
+                            if(!keywordList.contains(temp.getProductName())){
+                                temp.setMicType(1);
+                                temp.setIdaType(0);
+                                temp.setHchType(1);
+                                micAmount++;
+                            }else {
+                                temp.setIdaType(1);
+                                temp.setHchType(1);
+                                temp.setMicType(0);
+                                idaAmount++;
+                            }
+                        }else {
+                            temp.setIdaType(1);
+                            temp.setHchType(1);
+                            temp.setMicType(0);
+                            idaAmount++;
+                        }
+                    }
+                }
+            }
+            // ida/mic/hch数
+            manifestMawb.setIdaAmount(idaAmount);
+            manifestMawb.setIdaLeftAmount(idaAmount);
+            manifestMawb.setMicAmount(micAmount);
+            manifestMawb.setMicLeftAmount(micAmount);
+            manifestMawb.setHchAmount(NumberUtil.add(idaAmount,micAmount).longValue());
+            manifestMawb.setHchLeftAmount(NumberUtil.add(idaAmount,micAmount).longValue());
+            // status委託開始
+            manifestMawb.setStatus("2");
+            //manifest データ更新
+            this.update(manifestMawb);
+        }
+
+    }
+
+    /**
+     * INVの円貨算出
+     * @param invIso　通貨
+     * @param invValue　価格
+     * @return  円貨
+     */
+    private BigDecimal getINVYENKA(String invIso,BigDecimal invValue){
+        // inv為替レート
+        BigDecimal invRate;
+        // inv 円貨
+        BigDecimal invYenka;
+        if(StringUtils.isNotBlank(invIso) && invIso.equals("JPY")){
+            invYenka = invValue;
+        }else {
+            invRate = exchangeRateService.findRateByIsoAndToday(invIso,DateUtil.today());
+            if(ObjectUtil.isNull(invRate)){
+                invRate = new BigDecimal(0);
+            }
+            // 精度小数点2,四捨五入
+            invYenka = NumberUtil.mul(invValue,invRate);
+        }
+        return  invYenka;
+    }
+
+    /**
+     * 運賃算出
+     * @param frtIso　通貨
+     * @param frtValue　運賃
+     * @return 運賃
+     */
+    private BigDecimal getFRTVALUE( Long deptId, String frtIso,BigDecimal weight, BigDecimal frtValue){
+        BigDecimal retFrtValue = new BigDecimal(0);
+        // 運賃マスターより運賃算出（セットされている場合はセットされているほうを優先)）
+        if(StringUtils.isNotBlank(frtIso) && NumberUtil.equals(frtValue, new BigDecimal(0))){
+            List<BigDecimal> priceList = fareService.findByDeptAndIsoAndWeightIsLessThanEqualOrderByWeightAsc(deptId,frtIso,weight);
+            if(ObjectUtil.isNotEmpty(priceList)){
+                retFrtValue = priceList.get(0);
+            }else {
+                // 該当重量が無ければ最大値をセット
+                priceList = fareService.findHeightestPrice(deptId,frtIso);
+                if(ObjectUtil.isNotEmpty(priceList)){
+                    retFrtValue = priceList.get(0);
+                }
+            }
+        }
+        return retFrtValue;
+    }
+
+    /**
+     * 運賃円貨
+     * @param invCoinvoiceConditionCodede inv区分コード
+     * @param frtIso　通貨
+     * @param frtValue　価格
+     * @return  円貨
+     */
+    private BigDecimal getFRTYENKA(String invCoinvoiceConditionCodede,String frtIso,BigDecimal frtValue){
+        // frt為替レート
+        BigDecimal frtRate;
+        // frt円貨
+        BigDecimal frtYenka = new BigDecimal(0);
+        // インボイス価格条件FOB以外の時
+        if(StringUtils.isBlank(invCoinvoiceConditionCodede) || (!invCoinvoiceConditionCodede.equals("C&F") && !invCoinvoiceConditionCodede.equals("CIF"))){
+            if(StringUtils.isNotBlank(frtIso) && frtIso.equals("JPY")){
+                frtYenka = frtValue;
+            }else {
+                frtRate = exchangeRateService.findRateByIsoAndToday(frtIso,DateUtil.today());
+                if(ObjectUtil.isNull(frtRate)){
+                    frtRate = new BigDecimal(0);
+                }
+                //
+                frtYenka = NumberUtil.mul(frtValue,frtRate);
+            }
+        }
+        return  frtYenka;
+    }
+
+    /**
+     * ins円貨算出
+     * @param insIso　通貨
+     * @param insValue　価格
+     * @return  保険
+     */
+   private BigDecimal getINSYENKA(String insIso, BigDecimal insValue){
+        BigDecimal insRate;
+        BigDecimal insYenka = new BigDecimal(0);
+        if(StringUtils.isNotBlank(insIso) && insIso.equals("JPY")){
+            insYenka = insValue;
+        }else {
+            insRate = exchangeRateService.findRateByIsoAndToday(insIso,DateUtil.today());
+            if(ObjectUtil.isNull(insRate)){
+                insRate = new BigDecimal(0);
+            }
+            insYenka = NumberUtil.mul(insValue,insRate);
+        }
+        return insYenka;
+   }
+
+
 }

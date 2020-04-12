@@ -57,6 +57,10 @@ public class ManifestHawb implements Serializable {
     @NotBlank
     private String productName;
 
+    /** インボイス価格区分コード */
+    @Column(name = "invoice_classification_code")
+    private String invoiceClassificationCode;
+
     /** インボイス価格条件コード */
     @Column(name = "invoice_condition_code")
     private String invoiceConditionCode;
@@ -80,6 +84,10 @@ public class ManifestHawb implements Serializable {
     /** 運賃金額 */
     @Column(name = "fare_value")
     private BigDecimal fareValue;
+
+    /** 保険区分コード */
+    @Column(name = "insurance_classification_code")
+    private String insuranceClassificationCode;
 
     /** 保険通貨 */
     @Column(name = "insurance_iso")
@@ -192,6 +200,22 @@ public class ManifestHawb implements Serializable {
     /** 着払い金額 */
     @Column(name = "cash_on_delivery_amount")
     private BigDecimal cashOnDeliveryAmount;
+
+    /** 課税価格 CIF */
+    @Column(name = "dpr")
+    private BigDecimal dpr;
+
+    /** 記事 */
+    @Column(name = "nt1")
+    private String nt1;
+
+    /** 荷主セクションコード */
+    @Column(name = "nsc")
+    private String nsc;
+
+    /** 荷主リファレンスナンバー */
+    @Column(name = "nrn")
+    private String nrn;
 
     /**ida type **/
     @Column(name = "ida_type")

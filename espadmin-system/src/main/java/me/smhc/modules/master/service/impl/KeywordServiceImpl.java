@@ -108,4 +108,9 @@ public class KeywordServiceImpl implements KeywordService {
         }
         FileUtil.downloadExcel(list, response);
     }
+
+    @Override
+    public List<String> findAllPorductName() {
+        return keywordRepository.findAllPorductName();
+    }
 }

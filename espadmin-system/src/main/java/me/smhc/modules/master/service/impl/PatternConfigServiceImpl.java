@@ -49,12 +49,14 @@ public class PatternConfigServiceImpl implements PatternConfigService {
     }
 
     @Override
+    @Cacheable
     public Map<String,Object> queryAll(PatternConfigQueryCriteria criteria, Pageable pageable){
         Page<PatternConfig> page = patternConfigRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
         return PageUtil.toPage(page.map(patternConfigMapper::toDto));
     }
 
     @Override
+    @Cacheable
     public List<PatternConfigDto> queryAll(PatternConfigQueryCriteria criteria){
         return patternConfigMapper.toDto(patternConfigRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
     }

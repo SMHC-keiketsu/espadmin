@@ -49,10 +49,11 @@ public interface ManifestMawbService {
     /**
      * 上传
      * @param deptId 部门名称
+     * @param patternId pattern
      * @param file 文件
      * @return /
      */
-    Boolean create(Long deptId, MultipartFile file);
+    Boolean create(Long deptId, Long patternId, MultipartFile file);
     /**
     * 编辑
     * @param resources /
@@ -72,4 +73,11 @@ public interface ManifestMawbService {
     * @throws IOException /
     */
     void download(List<ManifestMawbDto> all, HttpServletResponse response) throws IOException;
+
+    /**
+     * CIF算出
+     * @param manifestMawbId id
+     */
+    void calculateCIF(Long manifestMawbId);
+
 }

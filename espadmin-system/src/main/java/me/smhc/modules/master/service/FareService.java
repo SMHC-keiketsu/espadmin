@@ -4,9 +4,13 @@ import me.smhc.modules.master.domain.Fare;
 import me.smhc.modules.master.service.dto.FareDto;
 import me.smhc.modules.master.service.dto.FareQueryCriteria;
 import org.springframework.data.domain.Pageable;
+
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.List;
 import java.io.IOException;
+
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 
@@ -71,5 +75,22 @@ public interface FareService {
     * @throws IOException /
     */
     void download(List<FareDto> all, HttpServletResponse response) throws IOException;
+
+    /**
+     * 運賃マスタ算出
+     * @param deptId　部門Id
+     * @param iso　通貨
+     * @param weight　重量
+     * @return  運賃
+     */
+    List<BigDecimal> findByDeptAndIsoAndWeightIsLessThanEqualOrderByWeightAsc(Long deptId, String iso, BigDecimal weight);
+
+    /**
+     * 最高価格運賃取得
+     * @param deptId　部門Id
+     * @param iso　通貨
+     * @return 運賃
+     */
+    List<BigDecimal>  findHeightestPrice(Long deptId,String iso);
 
 }

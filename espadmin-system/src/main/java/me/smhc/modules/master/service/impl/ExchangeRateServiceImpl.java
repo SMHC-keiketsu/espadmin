@@ -18,12 +18,10 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.util.*;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 
 /**
 * @author 布和
@@ -111,5 +109,10 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
             list.add(map);
         }
         FileUtil.downloadExcel(list, response);
+    }
+
+    @Override
+    public BigDecimal findRateByIsoAndToday(String iso, String today) {
+        return exchangeRateRepository.findRateByIsoAndToday(iso,today);
     }
 }

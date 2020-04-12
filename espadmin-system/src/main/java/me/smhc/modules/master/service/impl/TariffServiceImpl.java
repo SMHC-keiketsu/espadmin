@@ -119,4 +119,10 @@ public class TariffServiceImpl implements TariffService {
         }
         FileUtil.downloadExcel(list, response);
     }
+
+    @Override
+    @Cacheable(key = "#p0")
+    public TariffDto findByGovernmentCode(String governmentCode) {
+        return tariffMapper.toDto(tariffRepository.findByGovernmentCode(governmentCode));
+    }
 }

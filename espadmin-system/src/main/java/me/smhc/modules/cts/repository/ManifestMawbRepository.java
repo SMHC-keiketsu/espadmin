@@ -10,5 +10,10 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 */
 public interface ManifestMawbRepository extends JpaRepository<ManifestMawb, Long>, JpaSpecificationExecutor<ManifestMawb> {
 
-
+    /**
+     * 根据Mawbno查找
+     * @param mawbNo 主单号
+     * @return
+     */
+     ManifestMawb findByMawbNo(String mawbNo);
 }
