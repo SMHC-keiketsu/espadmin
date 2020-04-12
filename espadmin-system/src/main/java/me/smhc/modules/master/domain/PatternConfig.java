@@ -57,12 +57,10 @@ public class PatternConfig implements Serializable {
 
     /** 申告条件 */
     @Column(name = "jyo",nullable = false)
-    @NotBlank
     private String jyo;
 
     /** 申告先種別コード */
     @Column(name = "ic1",nullable = false)
-    @NotBlank
     private String ic1;
 
     /** 申告等種別コード */
@@ -75,62 +73,50 @@ public class PatternConfig implements Serializable {
 
     /** あて先官署コード */
     @Column(name = "ch",nullable = false)
-    @NotBlank
     private String ch;
 
     /** あて先部門コード */
     @Column(name = "chb",nullable = false)
-    @NotBlank
     private String chb;
 
     /** 申告予定年月日 */
     @Column(name = "icd",nullable = false)
-    @NotBlank
     private String icd;
 
     /** 積載機名 */
     @Column(name = "vsn",nullable = false)
-    @NotBlank
     private String vsn;
 
     /** 入港年月日 */
     @Column(name = "arr",nullable = false)
-    @NotBlank
     private String arr;
 
     /** 取卸港コード */
     @Column(name = "dst",nullable = false)
-    @NotBlank
     private String dst;
 
     /** 積出地コード */
     @Column(name = "psc",nullable = false)
-    @NotBlank
     private String psc;
 
     /** 通関予定蔵置場コード */
     @Column(name = "st",nullable = false)
-    @NotBlank
     private String st;
 
     /** 課税価格 */
     @Column(name = "dpr",nullable = false)
-    @NotBlank
     private String dpr;
 
     /** 記事 */
     @Column(name = "nt1",nullable = false)
-    @NotBlank
     private String nt1;
 
     /** 荷主セクションコード */
     @Column(name = "nsc",nullable = false)
-    @NotBlank
     private String nsc;
 
     /** 荷主リファレンスナンバー */
     @Column(name = "nrn",nullable = false)
-    @NotBlank
     private String nrn;
 
     /** 孫混載表示 */
@@ -179,57 +165,46 @@ public class PatternConfig implements Serializable {
 
     /** インボイス価格区分コード */
     @Column(name = "ip1",nullable = false)
-    @NotBlank
     private String ip1;
 
     /** インボイス価格条件コード */
     @Column(name = "ip2",nullable = false)
-    @NotBlank
     private String ip2;
 
     /** インボイス通貨コード */
     @Column(name = "ip3",nullable = false)
-    @NotBlank
     private String ip3;
 
     /** インボイス価格 */
     @Column(name = "ip4",nullable = false)
-    @NotBlank
     private String ip4;
 
     /** 運賃区分コード */
     @Column(name = "fr1",nullable = false)
-    @NotBlank
     private String fr1;
 
     /** 運賃通貨コード */
     @Column(name = "fr2",nullable = false)
-    @NotBlank
     private String fr2;
 
     /** 運賃 */
     @Column(name = "fr3",nullable = false)
-    @NotBlank
     private String fr3;
 
     /** 保険区分コード */
     @Column(name = "in1",nullable = false)
-    @NotBlank
     private String in1;
 
     /** 保険通貨コード */
     @Column(name = "in2",nullable = false)
-    @NotBlank
     private String in2;
 
     /** 保険金額 */
     @Column(name = "in3",nullable = false)
-    @NotBlank
     private String in3;
 
     /** 原産地コード */
     @Column(name = "[or]",nullable = false)
-    @NotBlank
     private String or;
 
     public @interface Update {}

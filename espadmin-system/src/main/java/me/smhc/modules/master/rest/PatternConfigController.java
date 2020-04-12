@@ -52,9 +52,6 @@ public class PatternConfigController {
         if(dept.getId() == null){
             return new ResponseEntity<>("代理店不能为空",HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        if(!flag) {
-            return new ResponseEntity<>(flag,HttpStatus.OK);
-        }
         return new ResponseEntity<>(flag,HttpStatus.OK);
     }
 
@@ -69,9 +66,6 @@ public class PatternConfigController {
         }
         if(dept.getId() == null){
             return new ResponseEntity<>("代理店不能为空",HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        if(!flag) {
-            return new ResponseEntity<>(flag,HttpStatus.OK);
         }
         return new ResponseEntity<>(flag,HttpStatus.OK);
     }
