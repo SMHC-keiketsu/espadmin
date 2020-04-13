@@ -70,4 +70,12 @@ public interface TariffService {
      * @return  税関
      */
     TariffDto findByGovernmentCode(String governmentCode);
+
+    /**
+     * 根据官署コード、ISOより税関
+     * @param governmentCode
+     * @param id
+     * @return  税関
+     */
+    Boolean findByGovernmentCodeAndId(String governmentCode, Long id);
 }

@@ -16,4 +16,12 @@ public interface TariffRepository extends JpaRepository<Tariff, Long>, JpaSpecif
      * @return  税関
      */
     Tariff findByGovernmentCode(String governmentCode);
+
+    /**
+     * 根据官署コードより税関
+     * @param governmentCode
+     * @param id
+     * @return  税関
+     */
+    Tariff findByGovernmentCodeAndId(String governmentCode, Long id);
 }

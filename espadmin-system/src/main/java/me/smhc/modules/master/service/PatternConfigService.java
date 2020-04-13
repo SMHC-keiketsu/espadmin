@@ -71,14 +71,13 @@ public interface PatternConfigService {
      * @param dept
      * @return
      */
-    Boolean findName(String name, Dept dept);
+    Boolean checkName(String name, Dept dept, Long id);
 
     /**
-     * 查询更新的时候是否有名称
-     * @param id
+     * 查询名称是否是唯一
      * @param name
      * @param dept
      * @return
      */
-    Boolean queryUpdateNaem(Long id, String name, Dept dept);
+    Boolean findByName(String name, Dept dept);
 }

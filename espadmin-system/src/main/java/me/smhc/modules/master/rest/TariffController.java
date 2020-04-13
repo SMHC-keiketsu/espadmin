@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
+import me.smhc.modules.master.service.dto.TariffDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -79,5 +80,14 @@ public class TariffController {
     public ResponseEntity<Object> deleteAll(@RequestBody Long[] ids) {
         tariffService.deleteAll(ids);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/checkGovernmentCode")
+    @Log("查询governmentCode")
+    @ApiOperation("查询governmentCode")
+    @PreAuthorize("@el.check('tariff:list')")
+    public ResponseEntity<Object> checkGovernmentCode(String governmentCode, Long id) {
+        boolean result = tariffService.findByGovernmentCodeAndId(governmentCode, id);
+        return new ResponseEntity<>(result,HttpStatus.OK);
     }
 }

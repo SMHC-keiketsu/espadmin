@@ -121,8 +121,34 @@ public class TariffServiceImpl implements TariffService {
     }
 
     @Override
-    @Cacheable(key = "#p0")
+    @Cacheable(key= "#governmentCode")
     public TariffDto findByGovernmentCode(String governmentCode) {
         return tariffMapper.toDto(tariffRepository.findByGovernmentCode(governmentCode));
+    }
+
+    @Override
+    @Cacheable(key="#governmentCode+''+#id")
+    public Boolean findByGovernmentCodeAndId(String governmentCode, Long id) {
+        Tariff tariff = null;
+        if(id == null) {
+            tariff = tariffRepository.findByGovernmentCode(governmentCode);
+            if(tariff == null){
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            tariff = tariffRepository.findByGovernmentCodeAndId(governmentCode,id);
+            if(tariff != null){
+                return true;
+            } else  {
+                tariff = tariffRepository.findByGovernmentCode(governmentCode);
+                if(tariff == null){
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
     }
 }

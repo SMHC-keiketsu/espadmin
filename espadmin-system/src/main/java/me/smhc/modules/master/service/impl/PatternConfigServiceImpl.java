@@ -1,6 +1,7 @@
 package me.smhc.modules.master.service.impl;
 
 import me.smhc.modules.master.domain.PatternConfig;
+import me.smhc.modules.master.domain.Tariff;
 import me.smhc.modules.master.service.dto.PatternConfigDto;
 import me.smhc.modules.system.domain.Dept;
 import me.smhc.modules.system.service.UserService;
@@ -117,12 +118,31 @@ public class PatternConfigServiceImpl implements PatternConfigService {
     }
 
     @Override
-    public Boolean findName(String name, Dept dept) {
-        return patternConfigRepository.findByNameAndDept(name,dept) != null ? false : true;
+    @Cacheable(key="#name+''+#dept+''+#id")
+    public Boolean checkName(String name, Dept dept, Long id) {
+        if(id == null) {
+            if(this.findByName(name,dept)){
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            PatternConfig patternConfig = patternConfigRepository.findByIdAndNameAndDept(id,name,dept);
+            if(patternConfig != null){
+                return true;
+            } else  {
+                if(this.findByName(name,dept)){
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
     }
 
     @Override
-    public Boolean queryUpdateNaem(Long id, String name, Dept dept) {
-        return patternConfigRepository.findByIdAndNameAndDept(id,name,dept) != null ? false : true;
+    @Cacheable(key="#name+''+#dept")
+    public Boolean findByName(String name, Dept dept) {
+        return patternConfigRepository.findByNameAndDept(name,dept) == null ? true : false;
     }
 }

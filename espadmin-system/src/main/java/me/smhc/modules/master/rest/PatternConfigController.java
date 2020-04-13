@@ -44,30 +44,15 @@ public class PatternConfigController {
     @Log("查询pattern的name")
     @ApiOperation("查询pattern的name")
     @PreAuthorize("@el.check('patternConfig:list')")
-    public ResponseEntity<Object> checkName(String name, Dept dept){
-        Boolean flag = patternConfigService.findName(name,dept);
-        if(StringUtils.isBlank(name)){
+    public ResponseEntity<Object> checkName( String name, Dept dept, Long id ){
+        if (StringUtils.isBlank(name)) {
             return new ResponseEntity<>("名称不能为空",HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        if(dept.getId() == null){
+        if (dept.getId() == null) {
             return new ResponseEntity<>("代理店不能为空",HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(flag,HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/checkUpdateName")
-    @Log("查询pattern的name")
-    @ApiOperation("查询pattern的name")
-    @PreAuthorize("@el.check('patternConfig:list')")
-    public ResponseEntity<Object> checkUpdateName(Long id,String name, Dept dept){
-        Boolean flag = patternConfigService.queryUpdateNaem(id,name,dept);
-        if(StringUtils.isBlank(name)){
-            return new ResponseEntity<>("名称不能为空",HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        if(dept.getId() == null){
-            return new ResponseEntity<>("代理店不能为空",HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity<>(flag,HttpStatus.OK);
+        Boolean result = patternConfigService.checkName(name,dept,id);
+        return new ResponseEntity<>(result,HttpStatus.OK);
     }
 
     @GetMapping
@@ -91,7 +76,7 @@ public class PatternConfigController {
     @ApiOperation("新增pattern")
     @PreAuthorize("@el.check('patternConfig:add')")
     public ResponseEntity<Object> create(@Validated @RequestBody PatternConfig resources){
-        boolean flag = patternConfigService.findName(resources.getName(),resources.getDept());
+        boolean flag = patternConfigService.checkName(resources.getName(),resources.getDept(),resources.getId());
         if(!flag){
             return new ResponseEntity<>("名称不能重复",HttpStatus.OK);
         }
