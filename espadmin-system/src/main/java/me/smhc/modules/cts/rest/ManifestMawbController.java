@@ -4,10 +4,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import me.smhc.aop.log.Log;
 import me.smhc.config.DataScope;
+import me.smhc.modules.cts.domain.ManifestHawb;
 import me.smhc.modules.cts.domain.ManifestMawb;
 import me.smhc.modules.cts.service.ManifestMawbService;
 import me.smhc.modules.cts.service.dto.ManifestMawbQueryCriteria;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,8 +17,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 /**
 * @author jhf
@@ -94,4 +98,13 @@ public class ManifestMawbController {
         manifestMawbService.calculateCIF(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @ApiOperation("Naccs電文作成")
+    @PutMapping(value = "/doNaccsTelegram")
+    @PreAuthorize("@el.check('manifest:edit')")
+    public ResponseEntity<Object> doNaccsTelegram(@RequestParam String type, @RequestParam Long manifestMawbId, @RequestParam List<Long> manifestHawbIdList, HttpServletRequest request, HttpServletResponse response){
+        manifestMawbService.doNaccsTelegram(type,manifestMawbId,manifestHawbIdList,request, response);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

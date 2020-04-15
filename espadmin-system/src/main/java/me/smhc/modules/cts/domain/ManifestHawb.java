@@ -39,6 +39,10 @@ public class ManifestHawb implements Serializable {
     @NotBlank
     private String hawbNo;
 
+    /** 識別符号 */
+    @Column(name = "skb")
+    private String skb;
+
     /** 個数 */
     @Column(name = "pcs")
     @NotNull
@@ -96,6 +100,10 @@ public class ManifestHawb implements Serializable {
     /** 保険金額 */
     @Column(name = "insurance_value")
     private BigDecimal insuranceValue;
+
+    /** 輸入者コード/cnc　*/
+    @Column(name = "imc")
+    private String imc;
 
     /** 荷受人名 */
     @Column(name = "importer_name")
@@ -216,6 +224,18 @@ public class ManifestHawb implements Serializable {
     /** 荷主リファレンスナンバー */
     @Column(name = "nrn")
     private String nrn;
+
+    /** 特殊貨物記号 */
+    @Column(name = "spc")
+    private String spc;
+
+    /** 仕向地 */
+    @Column(name = "hch_dst")
+    private String hchDst;
+
+    /** 搬入保税蔵置場 */
+    @Column(name = "ihw")
+    private String ihw;
 
     /**ida type **/
     @Column(name = "ida_type")

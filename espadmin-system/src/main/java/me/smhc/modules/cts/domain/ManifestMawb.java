@@ -170,18 +170,6 @@ public class ManifestMawb implements Serializable {
     @Column(name = "jnt")
     private String jnt;
 
-    /** 特殊貨物記号 */
-    @Column(name = "spc")
-    private String spc;
-
-    /** 仕向地 */
-    @Column(name = "hch_dst")
-    private String hchDst;
-
-    /** 搬入保税蔵置場 */
-    @Column(name = "ihw")
-    private String ihw;
-
     /** 数据版本号 乐观锁*/
     @Version
     @Column(name = "reserve_1")

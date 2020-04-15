@@ -30,6 +30,13 @@ public interface ManifestHawbService {
     List<ManifestHawbDto> queryAll(ManifestHawbQueryCriteria criteria);
 
     /**
+     * 根据IDs查找Hawb
+     * @param ids ID数组
+     * @return
+     */
+    List<ManifestHawb> findByIds(List<Long> ids);
+
+    /**
      * 根据ID查询
      * @param id ID
      * @return ManifestHawbDto

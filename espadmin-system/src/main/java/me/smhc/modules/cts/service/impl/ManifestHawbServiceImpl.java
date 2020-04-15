@@ -62,6 +62,11 @@ public class ManifestHawbServiceImpl implements ManifestHawbService {
     }
 
     @Override
+    public List<ManifestHawb> findByIds(List<Long> ids) {
+        return manifestHawbRepository.findByIdIn(ids);
+    }
+
+    @Override
     //@Cacheable(key = "#p0")
     public ManifestHawbDto findById(Long id) {
         ManifestHawb manifestHawb = manifestHawbRepository.findById(id).orElseGet(ManifestHawb::new);

@@ -125,15 +125,6 @@ public class ManifestMawbDto implements Serializable {
     /** ジョイント混載 */
     private String jnt;
 
-    /** 特殊貨物記号 */
-    private String spc;
-
-    /** 仕向地 */
-    private String hchDst;
-
-    /** 搬入保税蔵置場 */
-    private String ihw;
-
     /** 数据版本号 乐观锁*/
     private Long reserve1;
 

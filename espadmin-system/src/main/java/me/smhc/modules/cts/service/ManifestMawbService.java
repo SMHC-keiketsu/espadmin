@@ -1,11 +1,14 @@
 package me.smhc.modules.cts.service;
 
+import me.smhc.modules.cts.domain.ManifestHawb;
 import me.smhc.modules.cts.domain.ManifestMawb;
 import me.smhc.modules.cts.service.dto.ManifestMawbDto;
 import me.smhc.modules.cts.service.dto.ManifestMawbQueryCriteria;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
@@ -79,5 +82,14 @@ public interface ManifestMawbService {
      * @param manifestMawbId id
      */
     void calculateCIF(Long manifestMawbId);
+
+
+    /**
+     * Naccs電文作成
+     * @param type　電文タイプ
+     * @param manifestMawbId mawbId　
+     * @param manifestHawbIdList hawbId
+     */
+    void doNaccsTelegram(String type, Long manifestMawbId, List<Long> manifestHawbIdList, HttpServletRequest request, HttpServletResponse response);
 
 }

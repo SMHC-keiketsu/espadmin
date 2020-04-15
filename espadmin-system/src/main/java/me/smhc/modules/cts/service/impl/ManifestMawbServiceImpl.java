@@ -1,9 +1,10 @@
 package me.smhc.modules.cts.service.impl;
 
-import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.ZipUtil;
+import cn.hutool.extra.template.TemplateException;
 import cn.hutool.json.JSONObject;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
@@ -11,17 +12,14 @@ import me.smhc.exception.BadRequestException;
 import me.smhc.modules.cts.domain.ManifestHawb;
 import me.smhc.modules.cts.domain.ManifestMawb;
 import me.smhc.modules.cts.repository.ManifestMawbRepository;
+import me.smhc.modules.cts.service.ManifestHawbService;
 import me.smhc.modules.cts.service.ManifestMawbService;
 import me.smhc.modules.cts.service.dto.ManifestMawbDto;
 import me.smhc.modules.cts.service.dto.ManifestMawbQueryCriteria;
 import me.smhc.modules.cts.service.mapper.ManifestMawbMapper;
 import me.smhc.modules.master.domain.Agency;
 import me.smhc.modules.master.domain.ExcelConfig;
-import me.smhc.modules.master.domain.Keyword;
-import me.smhc.modules.master.domain.Tariff;
 import me.smhc.modules.master.service.*;
-import me.smhc.modules.master.service.dto.KeywordDto;
-import me.smhc.modules.master.service.dto.KeywordQueryCriteria;
 import me.smhc.modules.master.service.dto.PatternConfigDto;
 import me.smhc.modules.master.service.dto.TariffDto;
 import me.smhc.modules.system.domain.Dept;
@@ -39,7 +37,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -63,6 +64,8 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
 
     private final ManifestMawbMapper manifestMawbMapper;
 
+    private final ManifestHawbService manifestHawbService;
+
     private final UserService userService;
 
     private final DeptService deptService;
@@ -85,8 +88,9 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
     @Value("${file.maxSize}")
     private long maxSize;
 
-    public ManifestMawbServiceImpl(ManifestMawbRepository manifestMawbRepository, ManifestMawbMapper manifestMawbMapper, UserService userService, DeptService deptService, PatternConfigService patternConfigDtoService, TariffService tariffService, ExchangeRateService exchangeRateService, FareService fareService, KeywordService keywordService, ImporterService importerService) {
+    public ManifestMawbServiceImpl(ManifestMawbRepository manifestMawbRepository, ManifestMawbMapper manifestMawbMapper, ManifestHawbService manifestHawbService, UserService userService, DeptService deptService, PatternConfigService patternConfigDtoService, TariffService tariffService, ExchangeRateService exchangeRateService, FareService fareService, KeywordService keywordService, ImporterService importerService) {
         this.manifestMawbRepository = manifestMawbRepository;
+        this.manifestHawbService = manifestHawbService;
         this.manifestMawbMapper = manifestMawbMapper;
         this.userService = userService;
         this.deptService = deptService;
@@ -199,9 +203,6 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                         manifestMawb.setPot(patternConfigDto.getPot());
                         manifestMawb.setOrg(patternConfigDto.getOrg());
                         manifestMawb.setJnt(patternConfigDto.getJnt());
-                        manifestMawb.setSpc(patternConfigDto.getSpc());
-                        manifestMawb.setHchDst(patternConfigDto.getHchDst());
-                        manifestMawb.setIhw(patternConfigDto.getIhw());
 
                         // hawbList
                         List<ManifestHawb> manifestHawbList = new ArrayList<>();
@@ -394,6 +395,9 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                     manifestHawb.setNsc(patternConfigDto.getNsc());
                     /* 荷主リファレンスナンバー */
                     manifestHawb.setNrn(patternConfigDto.getNrn());
+                    manifestHawb.setSpc(patternConfigDto.getSpc());
+                    manifestHawb.setHchDst(patternConfigDto.getHchDst());
+                    manifestHawb.setIhw(patternConfigDto.getIhw());
 
                     /* Createor ID **/
                     manifestHawb.setCreateUserId(userDto.getId());
@@ -653,6 +657,243 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
 
     }
 
+    @Override
+    public void doNaccsTelegram(String type, Long manifestMawbId, List<Long> manifestHawbIdList, HttpServletRequest request, HttpServletResponse response) {
+        // manifest data
+        ManifestMawb manifestMawb = manifestMawbRepository.findById(manifestMawbId).orElseGet(ManifestMawb::new);
+        List<ManifestHawb> manifestHawbList = manifestHawbService.findByIds(manifestHawbIdList);
+        int maxCount = 1;
+        if(type.equals("HCH")){
+            maxCount =20;
+        }
+        //
+        int loopCount = NumberUtil.div(new BigDecimal(manifestHawbList.size()), new BigDecimal(maxCount)).intValue();
+        int cur = Math.floorMod(manifestHawbList.size(),maxCount);
+        if(cur > 0){
+            loopCount++;
+        }
+        if(loopCount == 0){
+            loopCount = 1;
+        }
+        //
+        String basePath = "";
+        //
+        try {
+            switch (type) {
+                case "IDA":
+                    basePath = this.idaTelegram(loopCount, maxCount, manifestMawb, manifestHawbList);
+                    break;
+                case "MIC":
+                    basePath = this.micTelegram(loopCount, maxCount, manifestMawb, manifestHawbList);
+                    break;
+                default:
+                    basePath = this.hchTelegram(loopCount, maxCount, manifestMawb, manifestHawbList);
+            }
+            File file = new File(basePath);
+            String zipPath = file.getPath() + ".zip";
+            ZipUtil.zip(file.getPath(), zipPath);
+            FileUtil.downloadFile(request, response, new File(zipPath), true);
+            // 删除缓存
+            FileUtil.del(basePath);
+            FileUtil.del(zipPath);
+        }catch (IOException e){
+            throw new BadRequestException("打包失败");
+        }
+    }
+
+    /**
+     * ida電文
+     * @param loopCount 循环
+     * @param maxCount 条数
+     * @param manifestMawb 主单
+     * @param manifestHawbList 分单数组
+     */
+    private String idaTelegram(int loopCount,int maxCount, ManifestMawb manifestMawb,List<ManifestHawb> manifestHawbList){
+        return "IDA";
+    }
+
+    /**
+     * mic电文
+     * @param loopCount 循环
+     * @param maxCount 条数
+     * @param manifestMawb 主单
+     * @param manifestHawbList 分单数组
+     */
+    private String micTelegram(int loopCount,int maxCount, ManifestMawb manifestMawb,List<ManifestHawb> manifestHawbList){
+        return  "MIC";
+    }
+
+    /**
+     * hch电文
+     * @param loopCount 循环
+     * @param maxCount 条数
+     * @param manifestMawb 主单
+     * @param manifestHawbList 分单数组
+     */
+    private String hchTelegram(int loopCount,int maxCount, ManifestMawb manifestMawb,List<ManifestHawb> manifestHawbList) throws IOException {
+
+        // base path
+        String tempPath = System.getProperty("java.io.tmpdir") + "HCH-" + manifestMawb.getMawbNo()+"-"+ DateUtil.today() +File.separator;
+        FileWriter writer = null;
+        // make telegram
+        for(int i = 0; i< loopCount; i++){
+            try {
+                String filePath = tempPath + "HCH-" + manifestMawb.getMawbNo() + "-" + String.format("%02d", i+1) + ".txt";
+                File file = new File(filePath);
+                // 存在覆盖
+                if(FileUtil.exist(file)){
+                    FileUtil.del(file);
+                }
+                FileUtil.touch(file);
+                writer = new FileWriter(file);
+                // 共同
+                writer.write(StringUtils.leftPad(" ", 3) + "HCH01" + StringUtils.leftPad(" ", 390));
+                //推荐使用，具有良好的跨平台性
+                String newLine = System.getProperty("line.separator");
+                writer.write(newLine);
+                 // 委託元混載業
+                if (StringUtils.isNotBlank(manifestMawb.getIbb())) {
+                    writer.write(manifestMawb.getIbb());
+                } else {
+                    writer.write(StringUtils.leftPad(" ", 5));
+                }
+                writer.write(newLine);
+                 // あて先官署コード
+                if (StringUtils.isNotBlank(manifestMawb.getCh())) {
+                    writer.write(manifestMawb.getCh());
+                } else {
+                    writer.write(StringUtils.leftPad(" ", 2));
+                }
+                writer.write(newLine);
+                 // MAWB番号
+                writer.write(manifestMawb.getMawbNo());
+                writer.write(newLine);
+                 // 孫混載表示
+                if (StringUtils.isNotBlank(manifestMawb.getMkh())) {
+                    writer.write(manifestMawb.getMkh());
+                } else {
+                    writer.write(StringUtils.leftPad(" ", 1));
+                }
+                writer.write(newLine);
+                 // 到着便名１
+                if (StringUtils.isNotBlank(manifestMawb.getFl1())) {
+                    writer.write(manifestMawb.getFl1());
+                } else {
+                    writer.write(StringUtils.leftPad(" ", 6));
+                }
+                writer.write(newLine);
+                 // 到着便名２
+                if (StringUtils.isNotBlank(manifestMawb.getFl2())) {
+                    writer.write(manifestMawb.getFl2());
+                } else {
+                    writer.write(StringUtils.leftPad(" ", 5));
+                }
+                writer.write(newLine);
+                 // 到着空港
+                if (StringUtils.isNotBlank(manifestMawb.getPot())) {
+                    writer.write(manifestMawb.getPot());
+                } else {
+                    writer.write(StringUtils.leftPad(" ", 3));
+                }
+                writer.write(newLine);
+                 // 仕出地
+                if (StringUtils.isNotBlank(manifestMawb.getOrg())) {
+                    writer.write(manifestMawb.getOrg());
+                } else {
+                    writer.write(StringUtils.leftPad(" ", 3));
+                }
+                writer.write(newLine);
+                 // ジョイント混載
+                if (StringUtils.isNotBlank(manifestMawb.getJnt())) {
+                    writer.write(manifestMawb.getJnt());
+                } else {
+                    writer.write(StringUtils.leftPad(" ", 1));
+                }
+                writer.write(newLine);
+                for (int j = 0; j < maxCount && j < manifestHawbList.size(); j++) {
+                    writer.write(manifestHawbList.get(j).getHawbNo());
+                    writer.write(newLine);
+                     // 個数
+                    writer.write(manifestHawbList.get(j).getPcs().toString());
+                    writer.write(newLine);
+                     // 重量
+                    writer.write(manifestHawbList.get(j).getWeight().toString());
+                    writer.write(newLine);
+                     // 重量コード
+                    writer.write(manifestHawbList.get(j).getWeightCode());
+                    writer.write(newLine);
+                     // 品名
+                    writer.write(manifestHawbList.get(j).getProductName());
+                    writer.write(newLine);
+                     // 特殊貨物記号
+                    if (StringUtils.isNotBlank(manifestHawbList.get(j).getSpc())) {
+                        writer.write(manifestHawbList.get(j).getSpc());
+                    } else {
+                        writer.write(StringUtils.leftPad(" ", 3));
+                    }
+                    writer.write(newLine);
+                    // 仕向地
+                    if (StringUtils.isNotBlank(manifestHawbList.get(j).getHchDst())) {
+                        writer.write(manifestHawbList.get(j).getHchDst());
+                    } else {
+                        writer.write(StringUtils.leftPad(" ", 3));
+                    }
+                    writer.write(newLine);
+                     // 搬入保税蔵置場
+                    if (StringUtils.isNotBlank(manifestHawbList.get(j).getIhw())) {
+                        writer.write(manifestHawbList.get(j).getIhw());
+                    } else {
+                        writer.write(StringUtils.leftPad(" ", 5));
+                    }
+                    writer.write(newLine);
+                      // 予備 使用しない
+                    writer.write(StringUtils.leftPad(" ", 1));
+                    writer.write(newLine);
+                      // 予備 使用しない
+                    writer.write(StringUtils.leftPad(" ", 3));
+                    writer.write(newLine);
+                     // 荷送人名
+                    writer.write(StringUtils.rightPad(manifestHawbList.get(j).getShipperName(), 70));
+                    writer.write(newLine);
+                     // 一括住所
+                    writer.write(StringUtils.rightPad(manifestHawbList.get(j).getShipperAddrAll(), 105));
+                    writer.write(newLine);
+                     // 荷送人TEL
+                    writer.write(StringUtils.rightPad(manifestHawbList.get(j).getShipperTel(), 14));
+                    writer.write(newLine);
+                     // 輸入者コード法人番号/cnc　
+                    if (StringUtils.isNotBlank(manifestHawbList.get(j).getImc())) {
+                        writer.write(manifestHawbList.get(j).getImc());
+                    } else {
+                        writer.write(StringUtils.leftPad(" ", 17));
+                    }
+                    writer.write(newLine);
+                     // 荷受人名
+                    writer.write(StringUtils.rightPad(manifestHawbList.get(j).getImporterName(), 70));
+                    writer.write(newLine);
+                     // 一括住所
+                    if (StringUtils.isNotBlank(manifestHawbList.get(j).getImporterAddrAll())) {
+                        writer.write(StringUtils.rightPad(manifestHawbList.get(j).getImporterAddrAll(), 105));
+                    } else {
+                        writer.write(manifestHawbList.get(j).getImporterAddr1() + " "
+                                + manifestHawbList.get(j).getImporterAddr2() + " "
+                                + manifestHawbList.get(j).getImporterAddr3() + " "
+                                + manifestHawbList.get(j).getImporterAddr4());
+                    }
+                    writer.write(newLine);
+                     // 荷受人TEL
+                    writer.write(StringUtils.rightPad(manifestHawbList.get(j).getImporterTel(), 14));
+                    writer.write(newLine);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                assert writer != null;
+                writer.close();
+            }
+        }
+        return  tempPath;
+    }
     /**
      * INVの円貨算出
      * @param invIso　通貨

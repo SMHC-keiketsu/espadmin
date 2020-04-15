@@ -31,6 +31,9 @@ public class ManifestHawbDto implements Serializable {
     /** HAWB番号 */
     private String hawbNo;
 
+    /** 識別符号 */
+    private String skb;
+
     /** 個数 */
     private Integer pcs;
 
@@ -72,6 +75,9 @@ public class ManifestHawbDto implements Serializable {
 
     /** 保険金額 */
     private BigDecimal insuranceValue;
+
+    /** 輸入者コード　*/
+    private String imc;
 
     /** 荷受人名 */
     private String importerName;
@@ -162,6 +168,15 @@ public class ManifestHawbDto implements Serializable {
 
     /** 荷主リファレンスナンバー */
     private String nrn;
+
+    /** 特殊貨物記号 */
+    private String spc;
+
+    /** 仕向地 */
+    private String hchDst;
+
+    /** 搬入保税蔵置場 */
+    private String ihw;
 
     /**ida type **/
     private Integer idaType;
