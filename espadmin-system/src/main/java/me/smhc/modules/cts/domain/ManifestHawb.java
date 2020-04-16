@@ -137,6 +137,10 @@ public class ManifestHawb implements Serializable {
     @Column(name = "importer_tel")
     private String importerTel;
 
+    /** 荷送人コード */
+    @Column(name = "epc")
+    private String epc;
+
     /** 荷送人名 */
     @Column(name = "shipper_name")
     private String shipperName;
@@ -236,6 +240,10 @@ public class ManifestHawb implements Serializable {
     /** 搬入保税蔵置場 */
     @Column(name = "ihw")
     private String ihw;
+
+    /** 社内整理用番号 */
+    @Column(name="ref")
+    private String ref;
 
     /**ida type **/
     @Column(name = "ida_type")

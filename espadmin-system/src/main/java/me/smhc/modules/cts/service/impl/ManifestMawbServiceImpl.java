@@ -44,6 +44,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 // 默认不使用缓存
@@ -171,6 +173,8 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
             if(ObjectUtil.isNotNull(excelConfig.getMainFestExcel())){
                 JSONObject jsonObject =  new JSONObject(excelConfig.getMainFestExcel());
                 Map<String,ManifestMawb> manifestMawbMap = new HashMap<>();
+                // 社内整理番号カウント
+                int intRef = 0;
                 for (Map<String,Object> row: readAll) {
                     if(ObjectUtil.isNull(manifestMawbMap) || !manifestMawbMap.containsKey(row.get(jsonObject.getStr("mawbNo")).toString().trim())) {
                         ManifestMawb manifestMawb = new ManifestMawb();
@@ -203,7 +207,23 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                         manifestMawb.setPot(patternConfigDto.getPot());
                         manifestMawb.setOrg(patternConfigDto.getOrg());
                         manifestMawb.setJnt(patternConfigDto.getJnt());
-
+                        // 到着便名１
+                        if(StringUtils.isBlank(manifestMawb.getFl1())){
+                            manifestMawb.setFl1(manifestMawb.getFlightNo());
+                        }
+                        // 入港年月日
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM", Locale.ENGLISH);
+                        if(ObjectUtil.isNotNull(manifestMawb.getFlightDate())){
+                            manifestMawb.setArr(DateUtil.format(manifestMawb.getFlightDate(),"yyyyMMdd"));
+                            if(StringUtils.isNotBlank(manifestMawb.getFl1())){
+                                if(manifestMawb.getFl1().length() <= 6){
+                                    // 積載機名
+                                    manifestMawb.setVsn(StringUtils.rightPad(manifestMawb.getFl1(),6)+"/"+ DateUtil.format(DateUtil.parse(manifestMawb.getArr()),"dd") + DateUtil.format(DateUtil.parse(manifestMawb.getArr()),dateFormat).toUpperCase());
+                                }
+                            }
+                            // 到着便名2
+                            manifestMawb.setFl2(DateUtil.format(DateUtil.parse(manifestMawb.getArr()),"dd") + DateUtil.format(DateUtil.parse(manifestMawb.getArr()),dateFormat).toUpperCase());
+                        }
                         // hawbList
                         List<ManifestHawb> manifestHawbList = new ArrayList<>();
                         manifestMawb.setManifestHawbList(manifestHawbList);
@@ -395,9 +415,15 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                     manifestHawb.setNsc(patternConfigDto.getNsc());
                     /* 荷主リファレンスナンバー */
                     manifestHawb.setNrn(patternConfigDto.getNrn());
+                    /* 特殊貨物記号 */
                     manifestHawb.setSpc(patternConfigDto.getSpc());
+                    /* 仕向地 */
                     manifestHawb.setHchDst(patternConfigDto.getHchDst());
+                    /* 搬入保税蔵置場 */
                     manifestHawb.setIhw(patternConfigDto.getIhw());
+                    /* 社内整理用番号 */
+                    intRef++;
+                    manifestHawb.setRef(String.valueOf(intRef));
 
                     /* Createor ID **/
                     manifestHawb.setCreateUserId(userDto.getId());
@@ -548,7 +574,7 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                         temp.setInsuranceValue(new BigDecimal(3000));
                         insYenka = new BigDecimal(3000);
                     }else {
-                        BigDecimal insValue = NumberUtil.mul(NumberUtil.add(invYenka,frtYenka),new BigDecimal(0.003));
+                        BigDecimal insValue = NumberUtil.mul(NumberUtil.add(invYenka,frtYenka),new BigDecimal("0.003"));
                         temp.setInsuranceValue(NumberUtil.round(insValue,0));
                         insYenka = temp.getInsuranceValue();
                     }
@@ -684,7 +710,7 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                     basePath = this.idaTelegram(loopCount, maxCount, manifestMawb, manifestHawbList);
                     break;
                 case "MIC":
-                    basePath = this.micTelegram(loopCount, maxCount, manifestMawb, manifestHawbList);
+                    basePath = this.micTelegram(loopCount, manifestMawb, manifestHawbList);
                     break;
                 default:
                     basePath = this.hchTelegram(loopCount, maxCount, manifestMawb, manifestHawbList);
@@ -715,12 +741,272 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
     /**
      * mic电文
      * @param loopCount 循环
-     * @param maxCount 条数
      * @param manifestMawb 主单
      * @param manifestHawbList 分单数组
      */
-    private String micTelegram(int loopCount,int maxCount, ManifestMawb manifestMawb,List<ManifestHawb> manifestHawbList){
-        return  "MIC";
+    private String micTelegram(int loopCount, ManifestMawb manifestMawb,List<ManifestHawb> manifestHawbList) throws IOException {
+        // base path
+        String tempPath = System.getProperty("java.io.tmpdir") + "MIC-" + manifestMawb.getMawbNo()+"-"+ DateUtil.today() +File.separator;
+        FileWriter writer = null;
+        // make telegram
+        for(int i = 0; i< loopCount; i++){
+            try {
+                String filePath = tempPath + "MIC-" + manifestMawb.getMawbNo() + "-" + String.format("%02d", i+1) + ".txt";
+                File file = new File(filePath);
+                // 存在覆盖
+                if(FileUtil.exist(file)){
+                    FileUtil.del(file);
+                }
+                FileUtil.touch(file);
+                writer = new FileWriter(file);
+                // 共同
+                writer.write(StringUtils.leftPad(" ", 3) + "MIC" + StringUtils.leftPad(" ", 392));
+                // 换行
+                String newLine = "\r\n"; // Windows
+                writer.write(newLine);
+                // 申告番号
+                writer.write("");
+                writer.write(newLine);
+                // 申告条件
+                writer.write(manifestMawb.getJyo() != null ? manifestMawb.getJyo() : "");
+                writer.write(newLine);
+                // 申告先種別コード
+                writer.write(manifestMawb.getIc1() != null ? manifestMawb.getIc1() : "");
+                writer.write(newLine);
+                // 識別符号
+                writer.write(manifestHawbList.get(i).getSkb() != null ? manifestHawbList.get(i).getSkb(): "");
+                writer.write(newLine);
+                // あて先官署コード
+                writer.write(manifestMawb.getCh() != null ? manifestMawb.getCh() : "");
+                writer.write(newLine);
+                // あて先部門コード
+                writer.write(manifestMawb.getChb() != null ? manifestMawb.getChb() : "");
+                writer.write(newLine);
+                //申告予定年月日
+                writer.write(manifestMawb.getIcd() != null ?  DateUtil.format(DateUtil.parse(manifestMawb.getIcd()),"yyyyMMdd"): "");
+                writer.write(newLine);
+                //輸入者コード
+                writer.write(manifestHawbList.get(i).getImc() != null ?manifestHawbList.get(i).getImc() : "");
+                writer.write(newLine);
+                //輸入者名
+                writer.write(manifestHawbList.get(i).getImporterName());
+                writer.write(newLine);
+                //郵便番号
+                writer.write(manifestHawbList.get(i).getImporterPosterCode() != null ? manifestHawbList.get(i).getImporterPosterCode() : "");
+                writer.write(newLine);
+                if(StringUtils.isNotBlank(manifestHawbList.get(i).getDeliveryAddr1())
+                        || StringUtils.isNotBlank(manifestHawbList.get(i).getDeliveryAddr2())
+                        || StringUtils.isNotBlank(manifestHawbList.get(i).getDeliveryAddr3())
+                        || StringUtils.isNotBlank(manifestHawbList.get(i).getDeliveryAddr4()))
+                {
+                    //住所1(都道府県)
+                    writer.write(manifestHawbList.get(i).getImporterAddr1() != null ? manifestHawbList.get(i).getImporterAddr1() : "");
+                    writer.write(newLine);
+                    //住所2(市区町村 (行政区名))
+                    writer.write(manifestHawbList.get(i).getImporterAddr2() != null ? manifestHawbList.get(i).getImporterAddr2() : "");
+                    writer.write(newLine);
+                    //住所3(町域名・番 地)
+                    writer.write(manifestHawbList.get(i).getImporterAddr3() != null ? manifestHawbList.get(i).getImporterAddr3() : "");
+                    writer.write(newLine);
+                    //住所4(ビル名ほ か)
+                    writer.write(manifestHawbList.get(i).getImporterAddr4() != null ? manifestHawbList.get(i).getImporterAddr4() : "");
+                    writer.write(newLine);
+                    //輸入者電話番号
+                    writer.write(manifestHawbList.get(i).getImporterTel() != null ? manifestHawbList.get(i).getImporterTel() : "");
+                    writer.write(newLine);
+                    //輸入者住所
+                    writer.write("");
+                    writer.write(newLine);
+                }else{
+                    //住所1(都道府県)
+                    writer.write("");
+                    writer.write(newLine);
+                    //住所2(市区町村 (行政区名))
+                    writer.write("");
+                    writer.write(newLine);
+                    //住所3(町域名・番 地)
+                    writer.write("");
+                    writer.write(newLine);
+                    //住所4(ビル名ほ か)
+                    writer.write("");
+                    writer.write(newLine);
+                    //輸入者電話番号
+                    writer.write(manifestHawbList.get(i).getImporterTel() != null ? manifestHawbList.get(i).getImporterTel() : "");
+                    writer.write(newLine);
+                    //輸入者住所
+                    writer.write(manifestHawbList.get(i).getImporterAddrAll() != null ? manifestHawbList.get(i).getImporterAddrAll() : "");
+                    writer.write(newLine);
+                }
+                //税関事務管理人コー ド
+                writer.write("");
+                writer.write(newLine);
+                //税関事務管理人受理 番号
+                writer.write("");
+                writer.write(newLine);
+                //税関事務管理人名
+                writer.write("");
+                writer.write(newLine);
+                //通関予定蔵置場コー ド
+                writer.write(manifestMawb.getSt() != null ? manifestMawb.getSt() : "");
+                writer.write(newLine);
+                //検査立会者
+                writer.write("");
+                writer.write(newLine);
+                //仕出人コード
+                writer.write(manifestHawbList.get(i).getEpc() != null ? manifestHawbList.get(i).getEpc() : "");
+                writer.write(newLine);
+                //仕出人名
+                writer.write(manifestHawbList.get(i).getShipperName() != null ? manifestHawbList.get(i).getShipperName() : "");
+                writer.write(newLine);
+                //住所1(Street and number/P.O.BOX)
+                writer.write("");
+                writer.write(newLine);
+                //住所２（Street and number/P.O.BOX）
+                writer.write("");
+                writer.write(newLine);
+                //住所３（City name）
+                writer.write("");
+                writer.write(newLine);
+                //"住所４（Country sub-entity,name）"
+                writer.write("");
+                writer.write(newLine);
+                //郵便番号（Postcode identification）
+                writer.write(manifestHawbList.get(i).getShipperPosterCode() != null ? manifestHawbList.get(i).getShipperPosterCode() : "");
+                writer.write(newLine);
+                //"国名コード Country,coded）"
+                writer.write("");
+                writer.write(newLine);
+                //仕出人住所
+                writer.write(manifestHawbList.get(i).getShipperAddrAll() != null ? manifestHawbList.get(i).getShipperAddrAll() : "");
+                writer.write(newLine);
+                //ＨＡＷＢ番号
+                writer.write(manifestHawbList.get(i).getHawbNo());
+                writer.write(newLine);
+                //ＭＡＷＢ番号
+                writer.write(manifestMawb.getMawbNo());
+                writer.write(newLine);
+                //貨物個数
+                writer.write(manifestHawbList.get(i).getPcs().toString());
+                writer.write(newLine);
+                //貨物重量 数部6桁、小数部1桁以内で入力
+                BigDecimal weigeht = manifestHawbList.get(i).getWeight();
+                writer.write(NumberUtil.round(weigeht,1).toString());
+                writer.write(newLine);
+                //積載機名
+                writer.write(manifestMawb.getVsn() != null ? manifestMawb.getVsn() : "");
+                writer.write(newLine);
+                //入港年月日
+                writer.write(manifestMawb.getArr() != null ? DateUtil.format(DateUtil.parse(manifestMawb.getArr()),"yyyyMMdd") : "");
+                writer.write(newLine);
+                //取卸港コード
+                writer.write(manifestMawb.getDst() != null ? manifestMawb.getDst() : "");
+                writer.write(newLine);
+                //積出地コード
+                writer.write(manifestMawb.getPsc() != null ? manifestMawb.getPsc() : "");
+                writer.write(newLine);
+                //インボイス価格区分コード
+                writer.write(manifestHawbList.get(i).getInvoiceClassificationCode() != null ? manifestHawbList.get(i).getInvoiceClassificationCode() : "");
+                writer.write(newLine);
+                //インボイス価格条件コード
+                writer.write(manifestHawbList.get(i).getInvoiceConditionCode() != null ? manifestHawbList.get(i).getInvoiceConditionCode() : "");
+                writer.write(newLine);
+                //インボイス通貨コード
+                writer.write(manifestHawbList.get(i).getInvoiceIso() != null ? manifestHawbList.get(i).getInvoiceIso() : "");
+                writer.write(newLine);
+                //インボイス価格
+                //1)通貨コードが「JPY」以外の場合は、小数点以下 第2位まで入力可 (2)通貨コードが「JPY」の場合は、小数点以下は入 力不可
+                BigDecimal invValue = manifestHawbList.get(i).getInvoiceValue();
+                if(invValue != null ){
+                    if(!manifestHawbList.get(i).getInvoiceIso().equals("JPY")){
+                        writer.write(NumberUtil.round(invValue,2).toString());
+                    }else {
+                        writer.write(NumberUtil.round(invValue,0).toString());
+                    }
+                }else {
+                    writer.write("");
+                }
+                writer.write(newLine);
+                //運賃区分コード
+                writer.write(manifestHawbList.get(i).getFareClassificationCode() != null ? manifestHawbList.get(i).getFareClassificationCode() : "");
+                writer.write(newLine);
+                //運賃通貨コード
+                writer.write(manifestHawbList.get(i).getFareIso() != null ? manifestHawbList.get(i).getFareIso() : "");
+                writer.write(newLine);
+                //運賃
+                //1)通貨コードが「JPY」以外の場合は、小数点以下 第2位まで入力可 (2)通貨コードが「JPY」の場合は、小数点以下は入 力不可
+                BigDecimal frtValue = manifestHawbList.get(i).getFareValue();
+                if(invValue != null ){
+                    if(!manifestHawbList.get(i).getFareIso().equals("JPY")){
+                        writer.write(NumberUtil.round(frtValue,2).toString());
+                    }else {
+                        writer.write(NumberUtil.round(frtValue,0).toString());
+                    }
+                }else {
+                    writer.write("");
+                }
+                writer.write(newLine);
+                //保険区分コード: インホイス価格条件にC&I価格またはCIF価格が入力 された場合は入力不可
+                if(StringUtils.isBlank(manifestHawbList.get(i).getInvoiceConditionCode()) || (!manifestHawbList.get(i).getInvoiceConditionCode().equals("C&F") && !manifestHawbList.get(i).getInvoiceConditionCode().equals("CIF"))){
+                    writer.write(manifestHawbList.get(i).getInsuranceClassificationCode() != null ? manifestHawbList.get(i).getInsuranceClassificationCode() : "");
+                }else{
+                    writer.write("");
+                }
+                writer.write(newLine);
+                //保険通貨コード:保険区分に個別保険を入力した場合に、保険通貨コードを 入力
+                if(manifestHawbList.get(i).getInsuranceClassificationCode() != null && manifestHawbList.get(i).getInsuranceClassificationCode().equals("A")){
+                    writer.write(manifestHawbList.get(i).getInsuranceIso() != null ? manifestHawbList.get(i).getInvoiceIso() : "");
+                }else {
+                    writer.write("");
+                }
+                writer.write(newLine);
+                //保険金額
+                if(manifestHawbList.get(i).getInsuranceClassificationCode() != null && manifestHawbList.get(i).getInsuranceClassificationCode().equals("A")){
+                    //1)通貨コードが「JPY」以外の場合は、小数点以下 第2位まで入力可 (2)通貨コードが「JPY」の場合は、小数点以下は入 力不可
+                    BigDecimal insValue = manifestHawbList.get(i).getInsuranceValue();
+                    if(invValue != null ){
+                        if(!manifestHawbList.get(i).getInsuranceIso().equals("JPY")){
+                            writer.write(NumberUtil.round(insValue,2).toString());
+                        }else {
+                            writer.write(NumberUtil.round(insValue,0).toString());
+                        }
+                    }else {
+                        writer.write("");
+                    }
+                }else {
+                    writer.write("");
+                }
+                writer.write(newLine);
+                //品名
+                writer.write(manifestHawbList.get(i).getProductName());
+                writer.write(newLine);
+                //原産地コード
+                writer.write(manifestHawbList.get(i).getOrigin());
+                writer.write(newLine);
+                //課税価格:小数点以下は入力不可
+                BigDecimal dpr = manifestHawbList.get(i).getDpr();
+                writer.write(NumberUtil.round(dpr,0).toString());
+                writer.write(newLine);
+                //記事
+                writer.write(manifestHawbList.get(i).getNt1() != null ? manifestHawbList.get(i).getNt1() : "");
+                writer.write(newLine);
+                //荷主セクションコード
+                writer.write(manifestHawbList.get(i).getNsc() != null ? manifestHawbList.get(i).getNsc(): "");
+                writer.write(newLine);
+                //荷主リファレンスナンバー
+                writer.write(manifestHawbList.get(i).getNrn() != null ? manifestHawbList.get(i).getNrn() : "");
+                writer.write(newLine);
+                //社内整理用番号
+                writer.write(manifestHawbList.get(i).getRef() != null ? manifestHawbList.get(i).getRef() : "");
+                writer.write(newLine);
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                assert writer != null;
+                writer.close();
+            }
+        }
+        return  tempPath;
     }
 
     /**
@@ -749,20 +1035,21 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                 // 共同
                 writer.write(StringUtils.leftPad(" ", 3) + "HCH01" + StringUtils.leftPad(" ", 390));
                 //推荐使用，具有良好的跨平台性
-                String newLine = System.getProperty("line.separator");
+                // String newLine = System.getProperty("line.separator");
+                String newLine = "\r\n"; // Windows
                 writer.write(newLine);
                  // 委託元混載業
                 if (StringUtils.isNotBlank(manifestMawb.getIbb())) {
                     writer.write(manifestMawb.getIbb());
                 } else {
-                    writer.write(StringUtils.leftPad(" ", 5));
+                    writer.write("");
                 }
                 writer.write(newLine);
                  // あて先官署コード
                 if (StringUtils.isNotBlank(manifestMawb.getCh())) {
                     writer.write(manifestMawb.getCh());
                 } else {
-                    writer.write(StringUtils.leftPad(" ", 2));
+                    writer.write("");
                 }
                 writer.write(newLine);
                  // MAWB番号
@@ -772,52 +1059,55 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                 if (StringUtils.isNotBlank(manifestMawb.getMkh())) {
                     writer.write(manifestMawb.getMkh());
                 } else {
-                    writer.write(StringUtils.leftPad(" ", 1));
+                    writer.write("");
                 }
                 writer.write(newLine);
                  // 到着便名１
                 if (StringUtils.isNotBlank(manifestMawb.getFl1())) {
                     writer.write(manifestMawb.getFl1());
                 } else {
-                    writer.write(StringUtils.leftPad(" ", 6));
+                    writer.write("");
                 }
                 writer.write(newLine);
                  // 到着便名２
                 if (StringUtils.isNotBlank(manifestMawb.getFl2())) {
                     writer.write(manifestMawb.getFl2());
                 } else {
-                    writer.write(StringUtils.leftPad(" ", 5));
+                    writer.write("");
                 }
                 writer.write(newLine);
                  // 到着空港
                 if (StringUtils.isNotBlank(manifestMawb.getPot())) {
                     writer.write(manifestMawb.getPot());
                 } else {
-                    writer.write(StringUtils.leftPad(" ", 3));
+                    writer.write("");
                 }
                 writer.write(newLine);
                  // 仕出地
                 if (StringUtils.isNotBlank(manifestMawb.getOrg())) {
                     writer.write(manifestMawb.getOrg());
                 } else {
-                    writer.write(StringUtils.leftPad(" ", 3));
+                    writer.write("");
                 }
                 writer.write(newLine);
                  // ジョイント混載
                 if (StringUtils.isNotBlank(manifestMawb.getJnt())) {
                     writer.write(manifestMawb.getJnt());
                 } else {
-                    writer.write(StringUtils.leftPad(" ", 1));
+                    writer.write("");
                 }
                 writer.write(newLine);
-                for (int j = 0; j < maxCount && j < manifestHawbList.size(); j++) {
+                // 分页(业务没有溢出)
+                int startIndex = maxCount * i;
+                for (int j = startIndex; j < (startIndex + maxCount) && j < manifestHawbList.size(); j++) {
                     writer.write(manifestHawbList.get(j).getHawbNo());
                     writer.write(newLine);
                      // 個数
                     writer.write(manifestHawbList.get(j).getPcs().toString());
                     writer.write(newLine);
                      // 重量
-                    writer.write(manifestHawbList.get(j).getWeight().toString());
+                    BigDecimal weight = manifestHawbList.get(j).getWeight();
+                    writer.write(NumberUtil.round(weight,1).toString());
                     writer.write(newLine);
                      // 重量コード
                     writer.write(manifestHawbList.get(j).getWeightCode());
@@ -829,28 +1119,28 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                     if (StringUtils.isNotBlank(manifestHawbList.get(j).getSpc())) {
                         writer.write(manifestHawbList.get(j).getSpc());
                     } else {
-                        writer.write(StringUtils.leftPad(" ", 3));
+                        writer.write("");
                     }
                     writer.write(newLine);
                     // 仕向地
                     if (StringUtils.isNotBlank(manifestHawbList.get(j).getHchDst())) {
                         writer.write(manifestHawbList.get(j).getHchDst());
                     } else {
-                        writer.write(StringUtils.leftPad(" ", 3));
+                        writer.write("");
                     }
                     writer.write(newLine);
                      // 搬入保税蔵置場
                     if (StringUtils.isNotBlank(manifestHawbList.get(j).getIhw())) {
                         writer.write(manifestHawbList.get(j).getIhw());
                     } else {
-                        writer.write(StringUtils.leftPad(" ", 5));
+                        writer.write("");
                     }
                     writer.write(newLine);
                       // 予備 使用しない
-                    writer.write(StringUtils.leftPad(" ", 1));
+                    writer.write("");
                     writer.write(newLine);
                       // 予備 使用しない
-                    writer.write(StringUtils.leftPad(" ", 3));
+                    writer.write("");
                     writer.write(newLine);
                      // 荷送人名
                     writer.write(StringUtils.rightPad(manifestHawbList.get(j).getShipperName(), 70));
@@ -859,13 +1149,13 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                     writer.write(StringUtils.rightPad(manifestHawbList.get(j).getShipperAddrAll(), 105));
                     writer.write(newLine);
                      // 荷送人TEL
-                    writer.write(StringUtils.rightPad(manifestHawbList.get(j).getShipperTel(), 14));
+                    writer.write(manifestHawbList.get(j).getShipperTel());
                     writer.write(newLine);
                      // 輸入者コード法人番号/cnc　
                     if (StringUtils.isNotBlank(manifestHawbList.get(j).getImc())) {
                         writer.write(manifestHawbList.get(j).getImc());
                     } else {
-                        writer.write(StringUtils.leftPad(" ", 17));
+                        writer.write("");
                     }
                     writer.write(newLine);
                      // 荷受人名
@@ -882,7 +1172,7 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                     }
                     writer.write(newLine);
                      // 荷受人TEL
-                    writer.write(StringUtils.rightPad(manifestHawbList.get(j).getImporterTel(), 14));
+                    writer.write(manifestHawbList.get(j).getImporterTel());
                     writer.write(newLine);
                 }
             } catch (IOException e) {
@@ -944,18 +1234,18 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
 
     /**
      * 運賃円貨
-     * @param invCoinvoiceConditionCodede inv区分コード
+     * @param invCoinvoiceConditionCode inv区分コード
      * @param frtIso　通貨
      * @param frtValue　価格
      * @return  円貨
      */
-    private BigDecimal getFRTYENKA(String invCoinvoiceConditionCodede,String frtIso,BigDecimal frtValue){
+    private BigDecimal getFRTYENKA(String invCoinvoiceConditionCode,String frtIso,BigDecimal frtValue){
         // frt為替レート
         BigDecimal frtRate;
         // frt円貨
         BigDecimal frtYenka = new BigDecimal(0);
         // インボイス価格条件FOB以外の時
-        if(StringUtils.isBlank(invCoinvoiceConditionCodede) || (!invCoinvoiceConditionCodede.equals("C&F") && !invCoinvoiceConditionCodede.equals("CIF"))){
+        if(StringUtils.isBlank(invCoinvoiceConditionCode) || (!invCoinvoiceConditionCode.equals("C&F") && !invCoinvoiceConditionCode.equals("CIF"))){
             if(StringUtils.isNotBlank(frtIso) && frtIso.equals("JPY")){
                 frtYenka = frtValue;
             }else {

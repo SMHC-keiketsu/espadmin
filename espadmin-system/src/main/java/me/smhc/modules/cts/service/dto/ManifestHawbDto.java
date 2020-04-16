@@ -103,6 +103,9 @@ public class ManifestHawbDto implements Serializable {
     /** 荷受人TEL */
     private String importerTel;
 
+    /** 荷送人コード */
+    private String epc;
+
     /** 荷送人名 */
     private String shipperName;
 
@@ -177,6 +180,9 @@ public class ManifestHawbDto implements Serializable {
 
     /** 搬入保税蔵置場 */
     private String ihw;
+
+    /** 社内整理用番号 */
+    private String ref;
 
     /**ida type **/
     private Integer idaType;
