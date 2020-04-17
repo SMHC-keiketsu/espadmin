@@ -4,7 +4,6 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ZipUtil;
-import cn.hutool.extra.template.TemplateException;
 import cn.hutool.json.JSONObject;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
@@ -29,6 +28,9 @@ import me.smhc.modules.system.service.dto.DeptDto;
 import me.smhc.modules.system.service.dto.UserDto;
 import me.smhc.utils.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -43,22 +45,17 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 // 默认不使用缓存
-//import org.springframework.cache.annotation.CacheConfig;
-//import org.springframework.cache.annotation.CacheEvict;
-//import org.springframework.cache.annotation.Cacheable;
 
 /**
 * @author jhf
 * @date 2020-03-24
 */
 @Service
-//@CacheConfig(cacheNames = "manifestMawb")
+@CacheConfig(cacheNames = "manifestMawb")
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
 public class ManifestMawbServiceImpl implements ManifestMawbService {
 
@@ -84,9 +81,6 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
 
     private final ImporterService importerService;
 
-    @Value("${file.path}")
-    private String path;
-
     @Value("${file.maxSize}")
     private long maxSize;
 
@@ -105,20 +99,20 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
     }
 
     @Override
-    //@Cacheable
+    @Cacheable
     public Map<String,Object> queryAll(ManifestMawbQueryCriteria criteria, Pageable pageable){
         Page<ManifestMawb> page = manifestMawbRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
         return PageUtil.toPage(page.map(manifestMawbMapper::toDto));
     }
 
     @Override
-    //@Cacheable
+    @Cacheable
     public List<ManifestMawbDto> queryAll(ManifestMawbQueryCriteria criteria){
         return manifestMawbMapper.toDto(manifestMawbRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
     }
 
     @Override
-    //@Cacheable(key = "#p0")
+    @Cacheable(key = "#p0")
     public ManifestMawbDto findById(Long id) {
         ManifestMawb ManifestMawb = manifestMawbRepository.findById(id).orElseGet(ManifestMawb::new);
         ValidationUtil.isNull(ManifestMawb.getId(),"Manifest","id",id);
@@ -140,7 +134,7 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
     }
 
     @Override
-    //@CacheEvict(allEntries = true)
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public Boolean create(Long deptId, Long patternId, MultipartFile multipartFile) {
         // check File Size
@@ -256,11 +250,11 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                     if(jsonObject.getStr("invoiceValue") != null) {
                         manifestHawb.setInvoiceValue(new BigDecimal(row.get(jsonObject.getStr("invoiceValue")).toString().trim()));
                     }else {
-                        manifestHawb.setInvoiceValue(new BigDecimal(patternConfigDto.getIp4()));
-                    }
-                    // Set default Value
-                    if(ObjectUtil.isEmpty(manifestHawb.getInvoiceValue())){
-                        manifestHawb.setInvoiceValue(new BigDecimal(0));
+                        if(ObjectUtil.isNotEmpty(patternConfigDto.getIp4())){
+                            manifestHawb.setInvoiceValue(new BigDecimal(patternConfigDto.getIp4()));
+                        }else{// Set default Value
+                            manifestHawb.setInvoiceValue(new BigDecimal(0));
+                        }
                     }
                     /* 運賃区分コード */
                     if(jsonObject.getStr("fareClassificationCode") != null) {
@@ -278,13 +272,12 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                     if(jsonObject.getStr("fareValue") != null) {
                         manifestHawb.setFareValue(new BigDecimal(row.get(jsonObject.getStr("fareValue")).toString().trim()));
                     }else {
-                        manifestHawb.setFareValue(new BigDecimal(patternConfigDto.getFr3()));
+                        if(ObjectUtil.isNotEmpty(patternConfigDto.getFr3())){
+                            manifestHawb.setFareValue(new BigDecimal(patternConfigDto.getFr3()));
+                        }else{// Set default Value
+                            manifestHawb.setFareValue(new BigDecimal(0));
+                        }
                     }
-                    // Set default Value
-                    if(ObjectUtil.isEmpty(manifestHawb.getFareValue())){
-                        manifestHawb.setFareValue(new BigDecimal(0));
-                    }
-
                     /* 保険区分コード */
                     manifestHawb.setInsuranceClassificationCode(patternConfigDto.getIn1());
 
@@ -298,13 +291,13 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                     if(jsonObject.getStr("insuranceValue") != null) {
                         manifestHawb.setInsuranceValue(new BigDecimal(row.get(jsonObject.getStr("insuranceValue")).toString().trim()));
                     }else {
-                        manifestHawb.setInsuranceValue(new BigDecimal(patternConfigDto.getIn3()));
-                    }
-                    // Set default Value
-                    if(ObjectUtil.isEmpty(manifestHawb.getInsuranceValue())){
-                        manifestHawb.setInsuranceValue(new BigDecimal(0));
-                    }
+                        if(ObjectUtil.isNotEmpty(patternConfigDto.getIn3())){
+                            manifestHawb.setInsuranceValue(new BigDecimal(patternConfigDto.getIn3()));
+                        }else {// Set default Value
+                            manifestHawb.setInsuranceValue(new BigDecimal(0));
+                        }
 
+                    }
                     if(jsonObject.getStr("importerName") != null) {
                         manifestHawb.setImporterName(row.get(jsonObject.getStr("importerName")).toString().trim().toUpperCase());
                     }
@@ -404,9 +397,10 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                         manifestHawb.setCashOnDeliveryAmount(new BigDecimal(row.get(jsonObject.getStr("cashOnDeliveryAmount")).toString().trim()));
                     }
                     /* 課税価格 CIF */
-                    manifestHawb.setDpr( NumberUtil.round(new BigDecimal(patternConfigDto.getDpr()),2,RoundingMode.HALF_UP));
-                    // Set Default Value
-                    if(ObjectUtil.isEmpty(manifestHawb.getDpr())){
+                    if(ObjectUtil.isNotEmpty(patternConfigDto.getDpr())){
+                        manifestHawb.setDpr(new BigDecimal(patternConfigDto.getDpr()));
+                    }else{
+                        // Set Default Value
                         manifestHawb.setDpr(new BigDecimal(0));
                     }
                     /* 記事 */
@@ -458,7 +452,7 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                 throw new BadRequestException( deptDto.getName() +"はエクセルフォーマットの設定がない");
             }
         }catch (Exception e){
-            throw e;
+            throw new BadRequestException("インポート失敗");
         }
     }
 
@@ -539,7 +533,7 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
     }
 
     @Override
-    //@CacheEvict(allEntries = true)
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void calculateCIF(Long manifestMawbId) {
         // manifestMawb取得
@@ -550,8 +544,8 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
             TariffDto tariffDto = tariffService.findByGovernmentCode(manifestMawb.getCh());
             // キーワード取得
             List<String> keywordList = keywordService.findAllPorductName();
-            Long idaAmount = Long.parseLong("0");
-            Long micAmount = Long.parseLong("0");
+            long idaAmount = 0;
+            long micAmount = 0;
             for(ManifestHawb temp: manifestMawb.getManifestHawbList()){
                 //INVの円貨算出
                 BigDecimal invYenka = this.getINVYENKA(temp.getInvoiceIso(),temp.getInvoiceValue());
@@ -567,7 +561,7 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                     temp.setFareValue(new BigDecimal(0));
                 }
                 //保険算出
-                BigDecimal insYenka = new BigDecimal(0);
+                BigDecimal insYenka;
                 if(temp.getInsuranceClassificationCode().equals("A") && NumberUtil.equals(temp.getInsuranceValue(),new BigDecimal(0))){
                     temp.setInsuranceIso("JPY");
                     if(NumberUtil.isLessOrEqual(invYenka,new BigDecimal(1000000))){
@@ -578,9 +572,10 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                         temp.setInsuranceValue(NumberUtil.round(insValue,0));
                         insYenka = temp.getInsuranceValue();
                     }
+                }else {
+                    // INSの円貨算出
+                    insYenka = this.getINSYENKA(temp.getInsuranceIso(),temp.getInsuranceValue());
                 }
-                // INSの円貨算出
-                insYenka = this.getINSYENKA(temp.getInsuranceIso(),temp.getInsuranceValue());
 
                 // CIF算出
                 BigDecimal cifValue = NumberUtil.add(invYenka,frtYenka,insYenka);
@@ -673,8 +668,8 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
             manifestMawb.setIdaLeftAmount(idaAmount);
             manifestMawb.setMicAmount(micAmount);
             manifestMawb.setMicLeftAmount(micAmount);
-            manifestMawb.setHchAmount(NumberUtil.add(idaAmount,micAmount).longValue());
-            manifestMawb.setHchLeftAmount(NumberUtil.add(idaAmount,micAmount).longValue());
+            manifestMawb.setHchAmount(idaAmount + micAmount);
+            manifestMawb.setHchLeftAmount(idaAmount + micAmount);
             // status委託開始
             manifestMawb.setStatus("2");
             //manifest データ更新
@@ -684,6 +679,8 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
     }
 
     @Override
+    @CacheEvict(allEntries = true)
+    @Transactional(rollbackFor = Exception.class)
     public void doNaccsTelegram(String type, Long manifestMawbId, List<Long> manifestHawbIdList, HttpServletRequest request, HttpServletResponse response) {
         // manifest data
         ManifestMawb manifestMawb = manifestMawbRepository.findById(manifestMawbId).orElseGet(ManifestMawb::new);
@@ -702,7 +699,7 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
             loopCount = 1;
         }
         //
-        String basePath = "";
+        String basePath;
         //
         try {
             switch (type) {
@@ -1202,8 +1199,10 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
             if(ObjectUtil.isNull(invRate)){
                 invRate = new BigDecimal(0);
             }
-            // 精度小数点2,四捨五入
+            // 乘法
             invYenka = NumberUtil.mul(invValue,invRate);
+            //取整
+            invYenka = NumberUtil.round(invYenka,0);
         }
         return  invYenka;
     }
@@ -1226,6 +1225,8 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                 priceList = fareService.findHeightestPrice(deptId,frtIso);
                 if(ObjectUtil.isNotEmpty(priceList)){
                     retFrtValue = priceList.get(0);
+                }else {
+                    retFrtValue = new BigDecimal(0);
                 }
             }
         }
@@ -1253,8 +1254,10 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                 if(ObjectUtil.isNull(frtRate)){
                     frtRate = new BigDecimal(0);
                 }
-                //
+                // 乘法
                 frtYenka = NumberUtil.mul(frtValue,frtRate);
+                // 取整
+                frtYenka = NumberUtil.round(frtYenka,0);
             }
         }
         return  frtYenka;
@@ -1268,7 +1271,7 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
      */
    private BigDecimal getINSYENKA(String insIso, BigDecimal insValue){
         BigDecimal insRate;
-        BigDecimal insYenka = new BigDecimal(0);
+        BigDecimal insYenka;
         if(StringUtils.isNotBlank(insIso) && insIso.equals("JPY")){
             insYenka = insValue;
         }else {
@@ -1276,7 +1279,10 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
             if(ObjectUtil.isNull(insRate)){
                 insRate = new BigDecimal(0);
             }
+            // 乘法
             insYenka = NumberUtil.mul(insValue,insRate);
+            // 取整
+            insYenka = NumberUtil.round(insYenka,0);
         }
         return insYenka;
    }
