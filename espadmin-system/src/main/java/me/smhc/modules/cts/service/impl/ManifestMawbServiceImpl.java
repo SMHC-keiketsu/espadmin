@@ -120,7 +120,7 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
     }
 
     @Override
-    //@CacheEvict(allEntries = true)
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public ManifestMawbDto create(ManifestMawb resources) {
         // if Agency is not setted
@@ -457,7 +457,7 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
     }
 
     @Override
-    //@CacheEvict(allEntries = true)
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void update(ManifestMawb resources) {
         ManifestMawb manifestMawb = manifestMawbRepository.findById(resources.getId()).orElseGet(ManifestMawb::new);
@@ -471,7 +471,7 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
     }
 
     @Override
-    //@CacheEvict(allEntries = true)
+    @CacheEvict(allEntries = true)
     public void deleteAll(Long[] ids) {
         for (Long id : ids) {
             manifestMawbRepository.deleteById(id);
@@ -1188,14 +1188,12 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
      * @return  円貨
      */
     private BigDecimal getINVYENKA(String invIso,BigDecimal invValue){
-        // inv為替レート
-        BigDecimal invRate;
         // inv 円貨
         BigDecimal invYenka;
         if(StringUtils.isNotBlank(invIso) && invIso.equals("JPY")){
             invYenka = invValue;
         }else {
-            invRate = exchangeRateService.findRateByIsoAndToday(invIso,DateUtil.today());
+            BigDecimal invRate = exchangeRateService.findRateByIsoAndToday(invIso,DateUtil.today());
             if(ObjectUtil.isNull(invRate)){
                 invRate = new BigDecimal(0);
             }
@@ -1241,8 +1239,6 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
      * @return  円貨
      */
     private BigDecimal getFRTYENKA(String invCoinvoiceConditionCode,String frtIso,BigDecimal frtValue){
-        // frt為替レート
-        BigDecimal frtRate;
         // frt円貨
         BigDecimal frtYenka = new BigDecimal(0);
         // インボイス価格条件FOB以外の時
@@ -1250,7 +1246,7 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
             if(StringUtils.isNotBlank(frtIso) && frtIso.equals("JPY")){
                 frtYenka = frtValue;
             }else {
-                frtRate = exchangeRateService.findRateByIsoAndToday(frtIso,DateUtil.today());
+                BigDecimal frtRate = exchangeRateService.findRateByIsoAndToday(frtIso,DateUtil.today());
                 if(ObjectUtil.isNull(frtRate)){
                     frtRate = new BigDecimal(0);
                 }
@@ -1270,12 +1266,11 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
      * @return  保険
      */
    private BigDecimal getINSYENKA(String insIso, BigDecimal insValue){
-        BigDecimal insRate;
         BigDecimal insYenka;
         if(StringUtils.isNotBlank(insIso) && insIso.equals("JPY")){
             insYenka = insValue;
         }else {
-            insRate = exchangeRateService.findRateByIsoAndToday(insIso,DateUtil.today());
+            BigDecimal insRate = exchangeRateService.findRateByIsoAndToday(insIso,DateUtil.today());
             if(ObjectUtil.isNull(insRate)){
                 insRate = new BigDecimal(0);
             }
