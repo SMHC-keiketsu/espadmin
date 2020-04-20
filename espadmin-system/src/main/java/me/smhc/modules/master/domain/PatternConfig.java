@@ -207,54 +207,6 @@ public class PatternConfig implements Serializable {
     @Column(name = "[or]",nullable = false)
     private String or;
 
-    /** 申告貨物識別 */
-    @Column(name ="ic2",nullable = false)
-    private String ic2;
-
-    /** 識別符号 */
-    @Column(name ="skb",nullable = false)
-    private String skb;
-
-    /** 貿易形態別符号 */
-    @Column(name ="bok",nullable = false)
-    private String bok;
-
-    /** 納付方法識別 */
-    @Column(name ="nof",nullable = false)
-    private String nof;
-
-    /** 口座番号 */
-    @Column(name ="pf",nullable = false)
-    private String pf;
-
-    /** 品目コード */
-    @Column(name ="cmd",nullable = false)
-    private String cmd;
-
-    /** ＮＡＣＣＳ用コード */
-    @Column(name ="cm2",nullable = false)
-    private String cm2;
-
-    /** 原産地証明書識別 */
-    @Column(name ="ors",nullable = false)
-    private String ors;
-
-    /** 数量単位コード（１） */
-    @Column(name ="qt1",nullable = false)
-    private String qt1;
-
-    /** 内国消費税等種別コード */
-    @Column(name ="tx_",nullable = false)
-    private String tx_;
-
-    /** インボイス識別 */
-    @Column(name ="iv1",nullable = false)
-    private String iv1;
-
-    /** 評価区分コード */
-    @Column(name ="vd1",nullable = false)
-    private String vd1;
-
     public @interface Update {}
 
     public void copy(PatternConfig source){
