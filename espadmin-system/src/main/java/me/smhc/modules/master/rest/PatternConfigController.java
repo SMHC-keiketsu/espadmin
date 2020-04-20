@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.annotations.*;
 import java.io.IOException;
+import java.util.Map;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 
@@ -60,7 +61,8 @@ public class PatternConfigController {
     @ApiOperation("查询pattern")
     @PreAuthorize("@el.check('patternConfig:list')")
     public ResponseEntity<Object> getPatternConfigs(PatternConfigQueryCriteria criteria, Pageable pageable){
-        return new ResponseEntity<>(patternConfigService.queryAll(criteria,pageable),HttpStatus.OK);
+        Map<String,Object> map = patternConfigService.queryAll(criteria,pageable);
+        return new ResponseEntity<>(map,HttpStatus.OK);
     }
 
     @GetMapping(path = "/getPattrens")

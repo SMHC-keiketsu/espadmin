@@ -142,4 +142,40 @@ public class PatternConfigDto implements Serializable {
 
     /** 原産地コード */
     private String or;
+
+    /** 申告貨物識別 */
+    private String ic2;
+
+    /** 識別符号 */
+    private String skb;
+
+    /** 貿易形態別符号 */
+    private String bok;
+
+    /** 納付方法識別 */
+    private String nof;
+
+    /** 口座番号 */
+    private String pf;
+
+    /** 品目コード */
+    private String cmd;
+
+    /** ＮＡＣＣＳ用コード */
+    private String cm2;
+
+    /** 原産地証明書識別 */
+    private String ors;
+
+    /** 数量単位コード（１） */
+    private String qt1;
+
+    /** 内国消費税等種別コード */
+    private String tx_;
+
+    /** インボイス識別 */
+    private String iv1;
+
+    /** 評価区分コード */
+    private String vd1;
 }
