@@ -245,21 +245,13 @@ public class ManifestHawb implements Serializable {
     @Column(name="ref")
     private String ref;
 
-    /**ida type **/
-    @Column(name = "ida_type")
-    private Integer idaType;
+    /**ida/mic type **/
+    @Column(name = "ida_mic_type")
+    private Integer idaMicType;
 
-    /** ida type status **/
-    @Column(name = "ida_type_status")
-    private Integer idaTypeStatus;
-
-    /**mic type **/
-    @Column(name = "mic_type")
-    private Integer micType;
-
-    /** mic type status **/
-    @Column(name = "mic_type_status")
-    private Integer micTypeStatus;
+    /** ida/mic type status **/
+    @Column(name = "ida_mic_type_status")
+    private Integer idaMicTypeStatus;
 
     /**hch type **/
     @Column(name = "hch_type")
@@ -268,6 +260,10 @@ public class ManifestHawb implements Serializable {
     /** hch type status **/
     @Column(name = "hch_type_status")
     private Integer hchTypeStatus;
+
+    /** 关键字包含 **/
+    @Column(name = "inKeyword")
+    private  Integer inKeyword;
 
     /** 预留1 */
     @Column(name = "reserve_1")

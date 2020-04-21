@@ -183,6 +183,7 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                         manifestMawb.setJyo(patternConfigDto.getJyo());
                         manifestMawb.setIc1(patternConfigDto.getIc1());
                         manifestMawb.setIcb(patternConfigDto.getIcb());
+                        manifestMawb.setIc2(patternConfigDto.getIc2());
                         manifestMawb.setLs(patternConfigDto.getLs());
                         manifestMawb.setCh(patternConfigDto.getCh());
                         manifestMawb.setChb(patternConfigDto.getChb());
@@ -192,6 +193,17 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                         manifestMawb.setDst(patternConfigDto.getDst());
                         manifestMawb.setPsc(patternConfigDto.getPsc());
                         manifestMawb.setSt(patternConfigDto.getSt());
+                        manifestMawb.setBok(patternConfigDto.getBok());
+                        manifestMawb.setNof(patternConfigDto.getNof());
+                        manifestMawb.setPf(patternConfigDto.getPf());
+                        manifestMawb.setCmd(patternConfigDto.getCmd());
+                        manifestMawb.setCm2(patternConfigDto.getCm2());
+                        manifestMawb.setOrs(patternConfigDto.getOrs());
+                        manifestMawb.setQt1(patternConfigDto.getQt1());
+                        manifestMawb.setTx_(patternConfigDto.getTx_());
+                        manifestMawb.setIv1(patternConfigDto.getIv1());
+                        manifestMawb.setVd1(patternConfigDto.getVd1());
+
                         // HCH Default Config
                         manifestMawb.setMkh(patternConfigDto.getMkh());
                         manifestMawb.setChc(patternConfigDto.getChc());
@@ -415,6 +427,8 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                     manifestHawb.setHchDst(patternConfigDto.getHchDst());
                     /* 搬入保税蔵置場 */
                     manifestHawb.setIhw(patternConfigDto.getIhw());
+                    /* 品名关键字是否包含 */
+                    manifestHawb.setInKeyword(0);
                     /* 社内整理用番号 */
                     intRef++;
                     manifestHawb.setRef(String.valueOf(intRef));
@@ -587,77 +601,69 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                     if(tariffDto.getCifLogic().equals(false) && tariffDto.getWeightLogic().equals(false)){
                         if(NumberUtil.isLessOrEqual(temp.getDpr(),tariffDto.getCifValue()) && NumberUtil.isLessOrEqual(temp.getWeight(),tariffDto.getWeightAmount())){
                             if(!keywordList.contains(temp.getProductName())){
-                                temp.setMicType(1);
-                                temp.setIdaType(0);
+                                temp.setIdaMicType(0); // 0:mic
                                 temp.setHchType(1);
                                 micAmount++;
                             }else {
-                                temp.setIdaType(1);
+                                temp.setIdaMicType(1); // 1:ida
                                 temp.setHchType(1);
-                                temp.setMicType(0);
+                                temp.setInKeyword(1);
                                 idaAmount++;
                             }
                         }else {
-                            temp.setIdaType(1);
+                            temp.setIdaMicType(1); // 1:ida
                             temp.setHchType(1);
-                            temp.setMicType(0);
                             idaAmount++;
                         }
                     }else if(tariffDto.getCifLogic().equals(false) && tariffDto.getWeightLogic().equals(true)){
                         if(NumberUtil.isLessOrEqual(temp.getDpr(),tariffDto.getCifValue()) && NumberUtil.isGreaterOrEqual(temp.getWeight(),tariffDto.getWeightAmount())){
                             if(!keywordList.contains(temp.getProductName())){
-                                temp.setMicType(1);
-                                temp.setIdaType(0);
+                                temp.setIdaMicType(0); // 0:mic
                                 temp.setHchType(1);
                                 micAmount++;
                             }else {
-                                temp.setIdaType(1);
+                                temp.setIdaMicType(1); // 1:ida
                                 temp.setHchType(1);
-                                temp.setMicType(0);
+                                temp.setInKeyword(1);
                                 idaAmount++;
                             }
                         }else {
-                            temp.setIdaType(1);
+                            temp.setIdaMicType(1); // 1:ida
                             temp.setHchType(1);
-                            temp.setMicType(0);
                             idaAmount++;
                         }
                     }else if(tariffDto.getCifLogic().equals(true) && tariffDto.getWeightLogic().equals(false)){
                         if(NumberUtil.isGreaterOrEqual(temp.getDpr(),tariffDto.getCifValue()) && NumberUtil.isLessOrEqual(temp.getWeight(),tariffDto.getWeightAmount())){
                             if(!keywordList.contains(temp.getProductName())){
-                                temp.setMicType(1);
-                                temp.setIdaType(0);
+                                temp.setIdaMicType(0); // 0:mic
                                 temp.setHchType(1);
                                 micAmount++;
                             }else {
-                                temp.setIdaType(1);
+                                temp.setIdaMicType(1); // 1:ida
                                 temp.setHchType(1);
-                                temp.setMicType(0);
+                                temp.setInKeyword(1);
                                 idaAmount++;
                             }
                         }else {
-                            temp.setIdaType(1);
+                            temp.setIdaMicType(1); // 1:ida
                             temp.setHchType(1);
-                            temp.setMicType(0);
                             idaAmount++;
                         }
                     }else {
                         if(NumberUtil.isGreaterOrEqual(temp.getDpr(),tariffDto.getCifValue()) && NumberUtil.isGreaterOrEqual(temp.getWeight(),tariffDto.getWeightAmount())){
                             if(!keywordList.contains(temp.getProductName())){
-                                temp.setMicType(1);
-                                temp.setIdaType(0);
+                                temp.setIdaMicType(0); // 0:mic
                                 temp.setHchType(1);
                                 micAmount++;
                             }else {
-                                temp.setIdaType(1);
+                                temp.setIdaMicType(1); // 1:ida
                                 temp.setHchType(1);
-                                temp.setMicType(0);
+                                temp.setInKeyword(1);
                                 idaAmount++;
                             }
                         }else {
-                            temp.setIdaType(1);
+                            temp.setIdaMicType(1); // 1:ida
                             temp.setHchType(1);
-                            temp.setMicType(0);
                             idaAmount++;
                         }
                     }
@@ -748,7 +754,7 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
         // make telegram
         for(int i = 0; i< loopCount; i++){
             try {
-                String filePath = tempPath + "MIC-" + manifestMawb.getMawbNo() + "-" + String.format("%02d", i+1) + ".txt";
+                String filePath = tempPath + "MIC-" + manifestMawb.getMawbNo() + "-" + String.format("%02d", Integer.parseInt(manifestHawbList.get(i).getRef())) + ".txt";
                 File file = new File(filePath);
                 // 存在覆盖
                 if(FileUtil.exist(file)){

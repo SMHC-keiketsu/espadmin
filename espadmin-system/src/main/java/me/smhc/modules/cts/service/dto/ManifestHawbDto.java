@@ -184,23 +184,20 @@ public class ManifestHawbDto implements Serializable {
     /** 社内整理用番号 */
     private String ref;
 
-    /**ida type **/
-    private Integer idaType;
+    /** ida/mic type **/
+    private Integer idaMicType;
 
-    /** ida type status **/
-    private Integer idaTypeStatus;
-
-    /**mic type **/
-    private Integer micType;
-
-    /** mic type status **/
-    private Integer micTypeStatus;
+    /** ida/mic type status **/
+    private Integer idaMicTypeStatus;
 
     /**hch type **/
     private Integer hchType;
 
     /** hch type status **/
     private Integer hchTypeStatus;
+
+    /** 关键字包含 **/
+    private  Integer inKeyword;
 
     /** 预留1 */
     private String reserve1;
