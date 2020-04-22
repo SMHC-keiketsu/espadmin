@@ -32,6 +32,14 @@ public class ManifestHawbController {
         this.manifestHawbService = manifestHawbService;
     }
 
+    @GetMapping(path = "/getManifestHawbByid")
+    @Log("查询manifestHawb")
+    @ApiOperation("查询manifestHawb")
+    @PreAuthorize("@el.check('manifest:list')")
+    public ResponseEntity<Object> getManifestHawbByid(@RequestParam Long id){
+        return new ResponseEntity<>(manifestHawbService.findById(id),HttpStatus.OK);
+    }
+
     @GetMapping
     @Log("查询manifestHawb")
     @ApiOperation("查询manifestHawb")

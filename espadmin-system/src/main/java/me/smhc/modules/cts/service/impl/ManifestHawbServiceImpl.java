@@ -8,12 +8,13 @@ import me.smhc.modules.cts.service.dto.ManifestHawbQueryCriteria;
 import me.smhc.modules.cts.service.mapper.ManifestHawbMapper;
 import me.smhc.modules.system.service.UserService;
 import me.smhc.modules.system.service.dto.UserDto;
-import me.smhc.utils.PageUtil;
-import me.smhc.utils.QueryHelp;
-import me.smhc.utils.SecurityUtils;
-import me.smhc.utils.ValidationUtil;
+import me.smhc.utils.*;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,16 +23,13 @@ import java.util.List;
 import java.util.Map;
 
 // 默认不使用缓存
-//import org.springframework.cache.annotation.CacheConfig;
-//import org.springframework.cache.annotation.CacheEvict;
-//import org.springframework.cache.annotation.Cacheable;
 
 /**
 * @author jhf
 * @date 2020-03-24
 */
 @Service
-//@CacheConfig(cacheNames = "manifestHawb")
+@CacheConfig(cacheNames = "manifestHawb")
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
 public class ManifestHawbServiceImpl implements ManifestHawbService {
 
@@ -39,24 +37,27 @@ public class ManifestHawbServiceImpl implements ManifestHawbService {
 
     private final ManifestHawbMapper manifestHawbMapper;
 
+    private final RedisUtils redisUtils;
+
     private final UserService userService;
 
 
-    public ManifestHawbServiceImpl(ManifestHawbRepository manifestHawbRepository, ManifestHawbMapper manifestHawbMapper, UserService userService) {
+    public ManifestHawbServiceImpl(ManifestHawbRepository manifestHawbRepository, ManifestHawbMapper manifestHawbMapper, RedisUtils redisUtils, UserService userService) {
         this.manifestHawbRepository = manifestHawbRepository;
         this.manifestHawbMapper = manifestHawbMapper;
+        this.redisUtils = redisUtils;
         this.userService = userService;
     }
 
     @Override
-    //@Cacheable
+    @Cacheable
     public Map<String,Object> queryAll(ManifestHawbQueryCriteria criteria, Pageable pageable){
         Page<ManifestHawb> page = manifestHawbRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
         return PageUtil.toPage(page.map(manifestHawbMapper::toDto));
     }
 
     @Override
-    //@Cacheable
+    @Cacheable
     public List<ManifestHawbDto> queryAll(ManifestHawbQueryCriteria criteria){
         return manifestHawbMapper.toDto(manifestHawbRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
     }
@@ -67,7 +68,7 @@ public class ManifestHawbServiceImpl implements ManifestHawbService {
     }
 
     @Override
-    //@Cacheable(key = "#p0")
+    @Cacheable(key = "#p0")
     public ManifestHawbDto findById(Long id) {
         ManifestHawb manifestHawb = manifestHawbRepository.findById(id).orElseGet(ManifestHawb::new);
         ValidationUtil.isNull(manifestHawb.getId(),"Manifest","id",id);
@@ -75,7 +76,7 @@ public class ManifestHawbServiceImpl implements ManifestHawbService {
     }
 
     @Override
-    //@CacheEvict(allEntries = true)
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public ManifestHawbDto create(ManifestHawb resources) {
         UserDto userDto = userService.findByName(SecurityUtils.getUsername());
@@ -85,17 +86,26 @@ public class ManifestHawbServiceImpl implements ManifestHawbService {
     }
 
     @Override
-    //@CacheEvict(allEntries = true)
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void update(ManifestHawb resources) {
         ManifestHawb manifestHawb = manifestHawbRepository.findById(resources.getId()).orElseGet(ManifestHawb::new);
         ValidationUtil.isNull( manifestHawb.getId(),"Manifest","id",resources.getId());
+        // 更新対象のデータを取得する際にも、バージョンのチェックを行うこと
+        if(!manifestHawb.getReserve1().equals(resources.getReserve1())){
+            throw new ObjectOptimisticLockingFailureException(ManifestHawb.class,"hawb:" + resources.getHawbNo()+"数据并发");
+        }
+        // 需要手动清理下manifestMawb缓存
+        String pattern = "manifestMawb::*";
+        List<String> keys = redisUtils.scan(pattern);
+        redisUtils.del(keys.toArray(new String[keys.size()]));
+
         manifestHawb.copy(resources);
         manifestHawbRepository.save(manifestHawb);
     }
 
     @Override
-    //@CacheEvict(allEntries = true)
+    @CacheEvict(allEntries = true)
     public void deleteAll(Long[] ids) {
         for (Long id : ids) {
             manifestHawbRepository.deleteById(id);

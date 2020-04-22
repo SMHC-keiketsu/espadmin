@@ -478,7 +478,7 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
         ValidationUtil.isNull( manifestMawb.getId(),"Manifest","id",resources.getId());
         // 更新対象のデータを取得する際にも、バージョンのチェックを行うこと
         if(!manifestMawb.getReserve1().equals(resources.getReserve1())){
-            throw new ObjectOptimisticLockingFailureException(ManifestHawb.class,"mawb:" + resources.getMawbNo()+"数据并发");
+            throw new ObjectOptimisticLockingFailureException(ManifestMawb.class,"mawb:" + resources.getMawbNo()+"数据并发");
         }
         manifestMawb.copy(resources);
         manifestMawbRepository.save(manifestMawb);

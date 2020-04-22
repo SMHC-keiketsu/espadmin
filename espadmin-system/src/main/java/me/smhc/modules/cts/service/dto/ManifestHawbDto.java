@@ -200,7 +200,7 @@ public class ManifestHawbDto implements Serializable {
     private  Integer inKeyword;
 
     /** 预留1 */
-    private String reserve1;
+    private Long reserve1;
 
     /** 预留2 */
     private String reserve2;

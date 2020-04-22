@@ -265,9 +265,10 @@ public class ManifestHawb implements Serializable {
     @Column(name = "inKeyword")
     private  Integer inKeyword;
 
-    /** 预留1 */
+    /** 数据版本号 乐观锁*/
+    @Version
     @Column(name = "reserve_1")
-    private String reserve1;
+    private Long reserve1;
 
     /** 预留2 */
     @Column(name = "reserve_2")
