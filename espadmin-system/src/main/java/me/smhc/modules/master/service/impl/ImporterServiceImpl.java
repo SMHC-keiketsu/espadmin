@@ -79,6 +79,13 @@ public class ImporterServiceImpl implements ImporterService {
     }
 
     @Override
+    @Cacheable(key = "#p0")
+    public List<ImporterDto> findByTel(String tel) {
+        List<Importer> importers = importerRepository.findByTel(tel);
+        return  importerMapper.toDto(importers);
+    }
+
+    @Override
     @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public ImporterDto create(Importer resources) {

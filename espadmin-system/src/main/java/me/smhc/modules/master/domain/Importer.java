@@ -43,7 +43,7 @@ public class Importer implements Serializable {
     /** 電話番号 */
     @Column(name = "tel",nullable = false)
     @NotBlank
-    @Size(max = 11)
+    @Size(max = 14)
     private String tel;
 
     /** 郵便番号 */
@@ -55,13 +55,13 @@ public class Importer implements Serializable {
     /** 輸入者名（英文） */
     @Column(name = "en_company_name",nullable = false)
     @NotBlank
-    @Size(max = 100)
+    @Size(max = 70)
     private String enCompanyName;
 
     /** 住所（英文） */
     @Column(name = "en_address_all",nullable = false)
     @NotBlank
-    @Size(max = 255)
+    @Size(max = 105)
     private String enAddressAll;
 
     /** 住所_都道府県（英文） */
@@ -85,19 +85,19 @@ public class Importer implements Serializable {
     /** 住所_建物（英文） */
     @Column(name = "en_address_4",nullable = false)
     @NotBlank
-    @Size(max = 104)
+    @Size(max = 35)
     private String enAddress4;
 
     /** 輸入者名（和文） */
     @Column(name = "ja_company_name",nullable = false)
     @NotBlank
-    @Size(max = 100)
+    @Size(max = 70)
     private String jaCompanyName;
 
     /** 住所（和文） */
     @Column(name = "ja_address_all",nullable = false)
     @NotBlank
-    @Size(max = 255)
+    @Size(max = 105)
     private String jaAddressAll;
 
     @Column(name = "create_time")

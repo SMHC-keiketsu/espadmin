@@ -37,6 +37,14 @@ public interface ImporterService {
      */
     ImporterDto findById(Long id);
 
+
+    /**
+     * 根据手机号码查询
+     * @param tel 电话
+     * @return 輸入者
+     */
+    List<ImporterDto> findByTel(String tel);
+
     /**
     * 创建
     * @param resources /
