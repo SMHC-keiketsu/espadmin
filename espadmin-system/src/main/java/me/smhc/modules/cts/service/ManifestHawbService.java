@@ -2,6 +2,7 @@ package me.smhc.modules.cts.service;
 
 import me.smhc.modules.cts.domain.ManifestHawb;
 import me.smhc.modules.cts.service.dto.ManifestHawbDto;
+import me.smhc.modules.cts.service.dto.ManifestHawbImporterDto;
 import me.smhc.modules.cts.service.dto.ManifestHawbQueryCriteria;
 import org.springframework.data.domain.Pageable;
 
@@ -62,4 +63,10 @@ public interface ManifestHawbService {
     */
     void deleteAll(Long[] ids);
 
+    /**
+     * 除重查找输入者
+     * @param ids hawb数据
+     * @return
+     */
+    List<ManifestHawbImporterDto> findDistinctImporter(List<Long> ids);
 }

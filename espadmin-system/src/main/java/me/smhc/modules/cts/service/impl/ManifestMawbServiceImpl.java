@@ -13,12 +13,17 @@ import me.smhc.modules.cts.domain.ManifestMawb;
 import me.smhc.modules.cts.repository.ManifestMawbRepository;
 import me.smhc.modules.cts.service.ManifestHawbService;
 import me.smhc.modules.cts.service.ManifestMawbService;
+import me.smhc.modules.cts.service.YunyuService;
+import me.smhc.modules.cts.service.dto.ManifestHawbImporterDto;
 import me.smhc.modules.cts.service.dto.ManifestMawbDto;
 import me.smhc.modules.cts.service.dto.ManifestMawbQueryCriteria;
+import me.smhc.modules.cts.service.dto.YunyuDto;
 import me.smhc.modules.cts.service.mapper.ManifestMawbMapper;
 import me.smhc.modules.master.domain.Agency;
 import me.smhc.modules.master.domain.ExcelConfig;
+import me.smhc.modules.master.domain.Importer;
 import me.smhc.modules.master.service.*;
+import me.smhc.modules.master.service.dto.ImporterDto;
 import me.smhc.modules.master.service.dto.PatternConfigDto;
 import me.smhc.modules.master.service.dto.TariffDto;
 import me.smhc.modules.system.domain.Dept;
@@ -81,10 +86,12 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
 
     private final ImporterService importerService;
 
+    private final YunyuService yunyuService;
+
     @Value("${file.maxSize}")
     private long maxSize;
 
-    public ManifestMawbServiceImpl(ManifestMawbRepository manifestMawbRepository, ManifestMawbMapper manifestMawbMapper, ManifestHawbService manifestHawbService, UserService userService, DeptService deptService, PatternConfigService patternConfigDtoService, TariffService tariffService, ExchangeRateService exchangeRateService, FareService fareService, KeywordService keywordService, ImporterService importerService) {
+    public ManifestMawbServiceImpl(ManifestMawbRepository manifestMawbRepository, ManifestMawbMapper manifestMawbMapper, ManifestHawbService manifestHawbService, UserService userService, DeptService deptService, PatternConfigService patternConfigDtoService, TariffService tariffService, ExchangeRateService exchangeRateService, FareService fareService, KeywordService keywordService, ImporterService importerService, YunyuService yunyuService) {
         this.manifestMawbRepository = manifestMawbRepository;
         this.manifestHawbService = manifestHawbService;
         this.manifestMawbMapper = manifestMawbMapper;
@@ -96,6 +103,7 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
         this.fareService = fareService;
         this.keywordService = keywordService;
         this.importerService = importerService;
+        this.yunyuService = yunyuService;
     }
 
     @Override
@@ -334,6 +342,50 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                     }
                     if(jsonObject.getStr("importerAddr4") != null) {
                         manifestHawb.setImporterAddr4(row.get(jsonObject.getStr("importerAddr4")).toString().trim());
+                    }
+                    // 歴史の輸入者マストとYunyuデータベースを検索して輸入者設定
+                    List<ImporterDto> importerDtoList = importerService.findByTel(manifestHawb.getImporterTel());
+                    if(ObjectUtil.isNotEmpty(importerDtoList) && importerDtoList.size() == 1){
+                        if(StringUtils.isNotEmpty(importerDtoList.get(0).getImc())){
+                            manifestHawb.setImc(importerDtoList.get(0).getImc());
+                        }
+                        if(StringUtils.isNotEmpty(importerDtoList.get(0).getCorporateNumber())){
+                            manifestHawb.setImporterName(importerDtoList.get(0).getEnCompanyName());
+                        }
+                        if(StringUtils.isNotEmpty(importerDtoList.get(0).getPostalCode())){
+                            manifestHawb.setImporterPosterCode(importerDtoList.get(0).getPostalCode());
+                        }
+                        if(StringUtils.isNotEmpty(importerDtoList.get(0).getEnAddressAll())){
+                            manifestHawb.setImporterAddrAll(importerDtoList.get(0).getEnAddressAll());
+                        }
+                        if(StringUtils.isNotEmpty(importerDtoList.get(0).getEnAddress1())){
+                            manifestHawb.setImporterAddr1(importerDtoList.get(0).getEnAddress1());
+                        }
+                        if(StringUtils.isNotEmpty(importerDtoList.get(0).getEnAddress2())){
+                            manifestHawb.setImporterAddr2(importerDtoList.get(0).getEnAddress2());
+                        }
+                        if(StringUtils.isNotEmpty(importerDtoList.get(0).getEnAddress3())){
+                            manifestHawb.setImporterAddr3(importerDtoList.get(0).getEnAddress3());
+                        }
+                        if(StringUtils.isNotEmpty(importerDtoList.get(0).getEnAddress4())){
+                            manifestHawb.setImporterAddr4(importerDtoList.get(0).getEnAddress4());
+                        }
+                    }else {
+                        // Yunyuデータベースを検索して輸入者設定
+                        List<YunyuDto> yunyuDtoList = yunyuService.findByKensakuTel(manifestHawb.getImporterTel());
+                        if (ObjectUtil.isNotEmpty(yunyuDtoList) && yunyuDtoList.size() == 1 ){
+                            manifestHawb.setImc(yunyuDtoList.get(0).getYunyuCd());
+                            manifestHawb.setImporterName(yunyuDtoList.get(0).getYunyuNmE());
+                            if(StringUtils.isEmpty(manifestHawb.getImporterAddrAll())){
+                                // addressない時
+                                manifestHawb.setImporterPosterCode(yunyuDtoList.get(0).getYunyuYuubinNo());
+                                manifestHawb.setImporterAddrAll(yunyuDtoList.get(0).getYunyuAddE1().trim()+" "+yunyuDtoList.get(0).getYunyuAddE2().trim()+" "+yunyuDtoList.get(0).getYunyuAddE3().trim() + " " + yunyuDtoList.get(0).getYunyuAddE4().trim());
+                                manifestHawb.setImporterAddr1(yunyuDtoList.get(0).getYunyuAddE1());
+                                manifestHawb.setImporterAddr2(yunyuDtoList.get(0).getYunyuAddE2());
+                                manifestHawb.setImporterAddr3(yunyuDtoList.get(0).getYunyuAddE3());
+                                manifestHawb.setImporterAddr4(yunyuDtoList.get(0).getYunyuAddE4());
+                            }
+                        }
                     }
                     if(jsonObject.getStr("shipperName") != null) {
                         manifestHawb.setShipperName(row.get(jsonObject.getStr("shipperName")).toString().trim());
@@ -691,6 +743,10 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
         // manifest data
         ManifestMawb manifestMawb = manifestMawbRepository.findById(manifestMawbId).orElseGet(ManifestMawb::new);
         List<ManifestHawb> manifestHawbList = manifestHawbService.findByIds(manifestHawbIdList);
+        // 保存manifest的输入者
+        List<ManifestHawbImporterDto> manifestHawbImporterDtos = manifestHawbService.findDistinctImporter(manifestHawbIdList);
+        importerService.saveImporter(manifestHawbImporterDtos);
+
         int maxCount = 1;
         if(type.equals("HCH")){
             maxCount =20;

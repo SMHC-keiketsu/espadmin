@@ -30,13 +30,11 @@ public class Importer implements Serializable {
 
     /** 輸入者コード */
     @Column(name = "imc",nullable = false)
-    @NotBlank
     @Size(max = 17)
     private String imc;
 
     /** 法人番号 */
     @Column(name = "corporate_number",nullable = false)
-    @NotBlank
     @Size(max = 17)
     private String corporateNumber;
 
@@ -48,7 +46,6 @@ public class Importer implements Serializable {
 
     /** 郵便番号 */
     @Column(name = "postal_code",nullable = false)
-    @NotBlank
     @Size(max = 9)
     private String postalCode;
 
@@ -60,43 +57,36 @@ public class Importer implements Serializable {
 
     /** 住所（英文） */
     @Column(name = "en_address_all",nullable = false)
-    @NotBlank
     @Size(max = 105)
     private String enAddressAll;
 
     /** 住所_都道府県（英文） */
     @Column(name = "en_address_1",nullable = false)
-    @NotBlank
     @Size(max = 35)
     private String enAddress1;
 
     /** 住所_市区町村（英文） */
     @Column(name = "en_address_2",nullable = false)
-    @NotBlank
     @Size(max = 35)
     private String enAddress2;
 
     /** 住所_番地（英文） */
     @Column(name = "en_address_3",nullable = false)
-    @NotBlank
     @Size(max = 35)
     private String enAddress3;
 
     /** 住所_建物（英文） */
     @Column(name = "en_address_4",nullable = false)
-    @NotBlank
     @Size(max = 35)
     private String enAddress4;
 
     /** 輸入者名（和文） */
     @Column(name = "ja_company_name",nullable = false)
-    @NotBlank
     @Size(max = 70)
     private String jaCompanyName;
 
     /** 住所（和文） */
     @Column(name = "ja_address_all",nullable = false)
-    @NotBlank
     @Size(max = 105)
     private String jaAddressAll;
 

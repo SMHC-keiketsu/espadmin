@@ -4,6 +4,7 @@ import me.smhc.modules.cts.domain.ManifestHawb;
 import me.smhc.modules.cts.repository.ManifestHawbRepository;
 import me.smhc.modules.cts.service.ManifestHawbService;
 import me.smhc.modules.cts.service.dto.ManifestHawbDto;
+import me.smhc.modules.cts.service.dto.ManifestHawbImporterDto;
 import me.smhc.modules.cts.service.dto.ManifestHawbQueryCriteria;
 import me.smhc.modules.cts.service.mapper.ManifestHawbMapper;
 import me.smhc.modules.system.service.UserService;
@@ -110,5 +111,10 @@ public class ManifestHawbServiceImpl implements ManifestHawbService {
         for (Long id : ids) {
             manifestHawbRepository.deleteById(id);
         }
+    }
+
+    @Override
+    public List<ManifestHawbImporterDto> findDistinctImporter(List<Long> ids) {
+        return manifestHawbRepository.findDistinctImporter(ids);
     }
 }

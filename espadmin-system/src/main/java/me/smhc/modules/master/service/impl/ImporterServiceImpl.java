@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import me.smhc.modules.cts.domain.ManifestHawb;
+import me.smhc.modules.cts.service.dto.ManifestHawbImporterDto;
 import me.smhc.modules.master.domain.Importer;
 import me.smhc.modules.master.repository.ImporterRepository;
 import me.smhc.modules.master.service.ImporterService;
@@ -147,39 +148,55 @@ public class ImporterServiceImpl implements ImporterService {
 
     /**
      * 保存manifest的输入者
-     * @param manifestHawbList hawbList
+     * @param manifestHawbImporterDtos manifestHawbImporterDtos
      */
-    public void saveImporter(List<ManifestHawb> manifestHawbList){
-        if(ObjectUtil.isNotEmpty(manifestHawbList)){
+    @Override
+    @CacheEvict(allEntries = true)
+    @Transactional(rollbackFor = Exception.class)
+    public void saveImporter(List<ManifestHawbImporterDto> manifestHawbImporterDtos){
+        if(ObjectUtil.isNotEmpty(manifestHawbImporterDtos)){
             UserDto userDto = userService.findByName(SecurityUtils.getUsername());
-            for (ManifestHawb temp: manifestHawbList) {
+            for (ManifestHawbImporterDto temp: manifestHawbImporterDtos) {
                 List<Importer> importerList = importerRepository.findByTel(temp.getImporterTel());
                 Importer importer = new Importer();
                 if(ObjectUtil.isNotEmpty(importerList) && importerList.size() == 1){
                     // update
                     importer = importerList.get(0);
-                    importer.setImc(temp.getImc());
-                    importer.setCorporateNumber(temp.getImporterName());
-                    importer.setPostalCode(temp.getImporterPosterCode());
-                    importer.setEnAddressAll(temp.getImporterAddrAll());
-                    importer.setEnAddress1(temp.getImporterAddr1());
-                    importer.setEnAddress2(temp.getImporterAddr2());
-                    importer.setEnAddress3(temp.getImporterAddr3());
-                    importer.setEnAddress4(temp.getImporterAddr4());
                     importer.setUpdateUserId(userDto.getId());
-                    importerRepository.save(importer);
                 }else if(ObjectUtil.isEmpty(importerList)){
                     // add
-                    importer.setImc(temp.getImc());
-                    importer.setCorporateNumber(temp.getImporterName());
-                    importer.setPostalCode(temp.getImporterPosterCode());
-                    importer.setEnAddressAll(temp.getImporterAddrAll());
-                    importer.setEnAddress1(temp.getImporterAddr1());
-                    importer.setEnAddress2(temp.getImporterAddr2());
-                    importer.setEnAddress3(temp.getImporterAddr3());
-                    importer.setEnAddress4(temp.getImporterAddr4());
                     importer.setCreateUserId(userDto.getId());
                     importer.setUpdateUserId(userDto.getId());
+
+                }
+                if(ObjectUtil.isNotEmpty(importer)){
+                    if(StringUtils.isNotBlank(temp.getImc())){
+                        importer.setImc(temp.getImc().trim());
+                    }
+                    if(StringUtils.isNotBlank(temp.getImporterName())){
+                        importer.setEnCompanyName(temp.getImporterName().trim());
+                    }
+                    if(StringUtils.isNotBlank(temp.getImporterTel())){
+                        importer.setTel(temp.getImporterTel().trim());
+                    }
+                    if(StringUtils.isNotBlank(temp.getImporterPosterCode())){
+                        importer.setPostalCode(temp.getImporterPosterCode().trim());
+                    }
+                    if(StringUtils.isNotBlank(temp.getImporterAddrAll())){
+                        importer.setEnAddressAll(temp.getImporterAddrAll().trim());
+                    }
+                    if(StringUtils.isNotBlank(temp.getImporterAddr1())){
+                        importer.setEnAddress1(temp.getImporterAddr1().trim());
+                    }
+                    if(StringUtils.isNotBlank(temp.getImporterAddr2())){
+                        importer.setEnAddress2(temp.getImporterAddr2().trim());
+                    }
+                    if(StringUtils.isNotBlank(temp.getImporterAddr3())){
+                        importer.setEnAddress3(temp.getImporterAddr3().trim());
+                    }
+                    if(StringUtils.isNotBlank(temp.getImporterAddr4())){
+                        importer.setEnAddress4(temp.getImporterAddr4().trim());
+                    }
                     importerRepository.save(importer);
                 }
             }

@@ -1,6 +1,7 @@
 package me.smhc.modules.master.service;
 
 import me.smhc.modules.cts.domain.ManifestHawb;
+import me.smhc.modules.cts.service.dto.ManifestHawbImporterDto;
 import me.smhc.modules.master.domain.Importer;
 import me.smhc.modules.master.service.dto.ImporterDto;
 import me.smhc.modules.master.service.dto.ImporterQueryCriteria;
@@ -75,7 +76,7 @@ public interface ImporterService {
 
     /**
      * 保存manifest的输入者
-     * @param manifestHawbList hawbList
+     * @param manifestHawbImporterDtos manifestHawbImporterDtos
      */
-     void saveImporter(List<ManifestHawb> manifestHawbList);
+     void saveImporter(List<ManifestHawbImporterDto> manifestHawbImporterDtos);
 }
