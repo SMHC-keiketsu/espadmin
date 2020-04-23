@@ -1,5 +1,6 @@
 package me.smhc.modules.master.service;
 
+import me.smhc.modules.cts.domain.ManifestHawb;
 import me.smhc.modules.master.domain.Importer;
 import me.smhc.modules.master.service.dto.ImporterDto;
 import me.smhc.modules.master.service.dto.ImporterQueryCriteria;
@@ -71,4 +72,10 @@ public interface ImporterService {
     * @throws IOException /
     */
     void download(List<ImporterDto> all, HttpServletResponse response) throws IOException;
+
+    /**
+     * 保存manifest的输入者
+     * @param manifestHawbList hawbList
+     */
+     void saveImporter(List<ManifestHawb> manifestHawbList);
 }

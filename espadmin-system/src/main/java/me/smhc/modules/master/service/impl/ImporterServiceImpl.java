@@ -149,7 +149,7 @@ public class ImporterServiceImpl implements ImporterService {
      * 保存manifest的输入者
      * @param manifestHawbList hawbList
      */
-    private void saveImporter(List<ManifestHawb> manifestHawbList){
+    public void saveImporter(List<ManifestHawb> manifestHawbList){
         if(ObjectUtil.isNotEmpty(manifestHawbList)){
             UserDto userDto = userService.findByName(SecurityUtils.getUsername());
             for (ManifestHawb temp: manifestHawbList) {
