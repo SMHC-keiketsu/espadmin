@@ -16,8 +16,8 @@ public class ImporterDto implements Serializable {
 
     private Long id;
 
-    /** 輸入者符号 */
-    private String jastproCode;
+    /** 輸入者コード */
+    private String imc;
 
     /** 法人番号 */
     private String corporateNumber;

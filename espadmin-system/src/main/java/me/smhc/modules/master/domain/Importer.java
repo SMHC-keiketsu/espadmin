@@ -28,11 +28,11 @@ public class Importer implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    /** 輸入者符号 */
-    @Column(name = "jastpro_code",nullable = false)
+    /** 輸入者コード */
+    @Column(name = "imc",nullable = false)
     @NotBlank
-    @Size(max = 12)
-    private String jastproCode;
+    @Size(max = 17)
+    private String imc;
 
     /** 法人番号 */
     @Column(name = "corporate_number",nullable = false)

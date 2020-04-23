@@ -117,7 +117,7 @@ public class ImporterServiceImpl implements ImporterService {
         List<Map<String, Object>> list = new ArrayList<>();
         for (ImporterDto importer : all) {
             Map<String,Object> map = new LinkedHashMap<>();
-            map.put("輸入者符号", importer.getJastproCode());
+            map.put("輸入者符号", importer.getImc());
             map.put("法人番号", importer.getCorporateNumber());
             map.put("電話番号", importer.getTel());
             map.put("郵便番号", importer.getPostalCode());
