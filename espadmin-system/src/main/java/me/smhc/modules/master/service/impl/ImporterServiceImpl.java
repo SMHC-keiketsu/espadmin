@@ -2,6 +2,8 @@ package me.smhc.modules.master.service.impl;
 
 import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ObjectUtil;
+import me.smhc.modules.cts.domain.ManifestHawb;
 import me.smhc.modules.master.domain.Importer;
 import me.smhc.modules.master.repository.ImporterRepository;
 import me.smhc.modules.master.service.ImporterService;
@@ -141,5 +143,47 @@ public class ImporterServiceImpl implements ImporterService {
             list.add(map);
         }
         FileUtil.downloadExcel(list, response);
+    }
+
+    /**
+     * 保存manifest的输入者
+     * @param manifestHawbList hawbList
+     */
+    private void saveImporter(List<ManifestHawb> manifestHawbList){
+        if(ObjectUtil.isNotEmpty(manifestHawbList)){
+            UserDto userDto = userService.findByName(SecurityUtils.getUsername());
+            for (ManifestHawb temp: manifestHawbList) {
+                List<Importer> importerList = importerRepository.findByTel(temp.getImporterTel());
+                Importer importer = new Importer();
+                if(ObjectUtil.isNotEmpty(importerList) && importerList.size() == 1){
+                    // update
+                    importer = importerList.get(0);
+                    importer.setImc(temp.getImc());
+                    importer.setCorporateNumber(temp.getImporterName());
+                    importer.setPostalCode(temp.getImporterPosterCode());
+                    importer.setEnAddressAll(temp.getImporterAddrAll());
+                    importer.setEnAddress1(temp.getImporterAddr1());
+                    importer.setEnAddress2(temp.getImporterAddr2());
+                    importer.setEnAddress3(temp.getImporterAddr3());
+                    importer.setEnAddress4(temp.getImporterAddr4());
+                    importer.setUpdateUserId(userDto.getId());
+                    importerRepository.save(importer);
+                }else if(ObjectUtil.isEmpty(importerList)){
+                    // add
+                    importer.setImc(temp.getImc());
+                    importer.setCorporateNumber(temp.getImporterName());
+                    importer.setPostalCode(temp.getImporterPosterCode());
+                    importer.setEnAddressAll(temp.getImporterAddrAll());
+                    importer.setEnAddress1(temp.getImporterAddr1());
+                    importer.setEnAddress2(temp.getImporterAddr2());
+                    importer.setEnAddress3(temp.getImporterAddr3());
+                    importer.setEnAddress4(temp.getImporterAddr4());
+                    importer.setCreateUserId(userDto.getId());
+                    importer.setUpdateUserId(userDto.getId());
+                    importerRepository.save(importer);
+                }
+            }
+        }
+
     }
 }
