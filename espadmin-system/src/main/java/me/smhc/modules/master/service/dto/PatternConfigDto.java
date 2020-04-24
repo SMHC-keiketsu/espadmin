@@ -38,9 +38,6 @@ public class PatternConfigDto implements Serializable {
     /** 申告等種別コード */
     private String icb;
 
-    /** 大額・少額識別 */
-    private String ls;
-
     /** あて先官署コード */
     private String ch;
 
@@ -69,7 +66,7 @@ public class PatternConfigDto implements Serializable {
     private String dpr;
 
     /** 記事 */
-    private String nt1;
+    private String nt2;
 
     /** 荷主セクションコード */
     private String nsc;

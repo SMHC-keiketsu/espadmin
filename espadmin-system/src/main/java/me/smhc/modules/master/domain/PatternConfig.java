@@ -67,10 +67,6 @@ public class PatternConfig implements Serializable {
     @Column(name = "icb",nullable = false)
     private String icb;
 
-    /** 大額・少額識別 */
-    @Column(name = "ls",nullable = false)
-    private String ls;
-
     /** あて先官署コード */
     @Column(name = "ch",nullable = false)
     private String ch;
@@ -108,8 +104,8 @@ public class PatternConfig implements Serializable {
     private String dpr;
 
     /** 記事 */
-    @Column(name = "nt1",nullable = false)
-    private String nt1;
+    @Column(name = "nt2",nullable = false)
+    private String nt2;
 
     /** 荷主セクションコード */
     @Column(name = "nsc",nullable = false)
