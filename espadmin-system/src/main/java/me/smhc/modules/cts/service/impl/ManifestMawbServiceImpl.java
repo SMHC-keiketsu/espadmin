@@ -328,20 +328,20 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                         manifestHawb.setImporterTel(row.get(jsonObject.getStr("importerTel")).toString().trim());
                     }
                     if(jsonObject.getStr("importerAddrAll") != null){
-                        manifestHawb.setImporterAddrAll(row.get(jsonObject.getStr("importerAddrAll")).toString().trim());
+                        manifestHawb.setImporterAddrAll(row.get(jsonObject.getStr("importerAddrAll")).toString().trim().toUpperCase());
                     }
 
                     if(jsonObject.getStr("importerAddr1") != null) {
-                        manifestHawb.setImporterAddr1(row.get(jsonObject.getStr("importerAddr1")).toString().trim());
+                        manifestHawb.setImporterAddr1(row.get(jsonObject.getStr("importerAddr1")).toString().trim().toUpperCase());
                     }
                     if(jsonObject.getStr("importerAddr2") != null) {
-                        manifestHawb.setImporterAddr2(row.get(jsonObject.getStr("importerAddr2")).toString().trim());
+                        manifestHawb.setImporterAddr2(row.get(jsonObject.getStr("importerAddr2")).toString().trim().toUpperCase());
                     }
                     if(jsonObject.getStr("importerAddr3") != null) {
-                        manifestHawb.setImporterAddr3(row.get(jsonObject.getStr("importerAddr3")).toString().trim());
+                        manifestHawb.setImporterAddr3(row.get(jsonObject.getStr("importerAddr3")).toString().trim().toUpperCase());
                     }
                     if(jsonObject.getStr("importerAddr4") != null) {
-                        manifestHawb.setImporterAddr4(row.get(jsonObject.getStr("importerAddr4")).toString().trim());
+                        manifestHawb.setImporterAddr4(row.get(jsonObject.getStr("importerAddr4")).toString().trim().toUpperCase());
                     }
                     // 歴史の輸入者マストとYunyuデータベースを検索して輸入者設定
                     List<ImporterDto> importerDtoList = importerService.findByTel(manifestHawb.getImporterTel());
@@ -388,7 +388,7 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                         }
                     }
                     if(jsonObject.getStr("shipperName") != null) {
-                        manifestHawb.setShipperName(row.get(jsonObject.getStr("shipperName")).toString().trim());
+                        manifestHawb.setShipperName(row.get(jsonObject.getStr("shipperName")).toString().trim().toUpperCase());
                     }
                     if(jsonObject.getStr("shipperPosterCode") != null) {
                         manifestHawb.setShipperPosterCode(row.get(jsonObject.getStr("shipperPosterCode")).toString().trim());
@@ -397,7 +397,7 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                         manifestHawb.setShipperTel(row.get(jsonObject.getStr("shipperTel")).toString().trim());
                     }
                     if(jsonObject.getStr("shipperAddrAll") != null) {
-                        manifestHawb.setShipperAddrAll(row.get(jsonObject.getStr("shipperAddrAll")).toString().trim());
+                        manifestHawb.setShipperAddrAll(row.get(jsonObject.getStr("shipperAddrAll")).toString().trim().toUpperCase());
                     }
                     /* 原産地コード */
                     if(jsonObject.getStr("origin") != null) {
@@ -412,7 +412,7 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                     /* 納品先名 */
                     if(jsonObject.getStr("deliveryDestination") != null) {
 
-                        manifestHawb.setDeliveryDestination(row.get(jsonObject.getStr("deliveryDestination")).toString().trim());
+                        manifestHawb.setDeliveryDestination(row.get(jsonObject.getStr("deliveryDestination")).toString().trim().toUpperCase());
 
                         if(jsonObject.getStr("deliveryTel") != null) {
                             manifestHawb.setDeliveryTel(row.get(jsonObject.getStr("deliveryTel")).toString().trim());
@@ -421,19 +421,19 @@ public class ManifestMawbServiceImpl implements ManifestMawbService {
                             manifestHawb.setDeliveryPosterCode(row.get(jsonObject.getStr("deliveryPosterCode")).toString().trim());
                         }
                         if(jsonObject.getStr("deliveryAddrAll") != null) {
-                            manifestHawb.setDeliveryAddrAll(row.get(jsonObject.getStr("deliveryAddrAll")).toString().trim());
+                            manifestHawb.setDeliveryAddrAll(row.get(jsonObject.getStr("deliveryAddrAll")).toString().trim().toUpperCase());
                         }
                         if(jsonObject.getStr("deliveryAddr1") != null) {
-                            manifestHawb.setDeliveryAddr1(row.get(jsonObject.getStr("deliveryAddr1")).toString().trim());
+                            manifestHawb.setDeliveryAddr1(row.get(jsonObject.getStr("deliveryAddr1")).toString().trim().toUpperCase());
                         }
                         if(jsonObject.getStr("deliveryAddr2") != null) {
-                            manifestHawb.setDeliveryAddr2(row.get(jsonObject.getStr("deliveryAddr2")).toString().trim());
+                            manifestHawb.setDeliveryAddr2(row.get(jsonObject.getStr("deliveryAddr2")).toString().trim().toUpperCase());
                         }
                         if(jsonObject.getStr("deliveryAddr3") != null) {
-                            manifestHawb.setDeliveryAddr3(row.get(jsonObject.getStr("deliveryAddr3")).toString().trim());
+                            manifestHawb.setDeliveryAddr3(row.get(jsonObject.getStr("deliveryAddr3")).toString().trim().toUpperCase());
                         }
                         if(jsonObject.getStr("deliveryAddr4") != null) {
-                            manifestHawb.setDeliveryAddr4(row.get(jsonObject.getStr("deliveryAddr4")).toString().trim());
+                            manifestHawb.setDeliveryAddr4(row.get(jsonObject.getStr("deliveryAddr4")).toString().trim().toUpperCase());
                         }
                     }
                     // 納品先がない場合、輸入者の情報をコッピーします
