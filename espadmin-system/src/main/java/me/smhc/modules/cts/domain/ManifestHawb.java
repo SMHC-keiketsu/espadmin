@@ -217,9 +217,9 @@ public class ManifestHawb implements Serializable {
     @Column(name = "dpr")
     private BigDecimal dpr;
 
-    /** 記事 */
-    @Column(name = "nt1")
-    private String nt1;
+    /** 記事 （通関業者用)*/
+    @Column(name = "nt2")
+    private String nt2;
 
     /** 荷主セクションコード */
     @Column(name = "nsc")

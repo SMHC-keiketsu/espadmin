@@ -20,9 +20,10 @@ public interface YunyuRepository extends JpaRepository<Yunyu, String>, JpaSpecif
     List<Yunyu> findByKensakuTel(String kensakuTel);
 
     /**
-     * 根据法人番号查找輸入者
+     * 根据輸入者コードOR法人番号查找輸入者
+     * @param yunyuCd   輸入者コード
      * @param houjinNo　法人番号
      * @return  輸入者
      */
-    Yunyu findByHoujinNo(String houjinNo);
+    Yunyu findByYunyuCdOrHoujinNo(String yunyuCd, String houjinNo);
 }

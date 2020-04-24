@@ -74,9 +74,9 @@ public class YunyuServiceImpl implements YunyuService {
     }
 
     @Override
-    @Cacheable(key = "#p0")
-    public YunyuDto findByHoujinNo(String houjinNo){
-        Yunyu yunyu = yunyuRepository.findByHoujinNo(houjinNo);
+    @Cacheable(key = "#p0-#p1")
+    public YunyuDto findByYunyuCdOrHoujinNo(String yunyuCd, String houjinNo){
+        Yunyu yunyu = yunyuRepository.findByYunyuCdOrHoujinNo(yunyuCd,houjinNo);
         return yunyuMapper.toDto(yunyu);
     }
 

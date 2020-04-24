@@ -102,10 +102,6 @@ public class ManifestMawb implements Serializable {
     @Column(name = "icb")
     private String icb;
 
-    /** 大額・少額識別 */
-    @Column(name = "ls")
-    private String ls;
-
     /** あて先官署コード */
     @Column(name = "ch")
     private String ch;
@@ -171,47 +167,47 @@ public class ManifestMawb implements Serializable {
     private String jnt;
 
     /** 申告貨物識別 */
-    @Column(name ="ic2",nullable = false)
+    @Column(name ="ic2")
     private String ic2;
 
     /** 貿易形態別符号 */
-    @Column(name ="bok",nullable = false)
+    @Column(name ="bok")
     private String bok;
 
     /** 納付方法識別 */
-    @Column(name ="nof",nullable = false)
+    @Column(name ="nof")
     private String nof;
 
     /** 口座番号 */
-    @Column(name ="pf",nullable = false)
+    @Column(name ="pf")
     private String pf;
 
     /** 品目コード */
-    @Column(name ="cmd",nullable = false)
+    @Column(name ="cmd")
     private String cmd;
 
     /** ＮＡＣＣＳ用コード */
-    @Column(name ="cm2",nullable = false)
+    @Column(name ="cm2")
     private String cm2;
 
     /** 原産地証明書識別 */
-    @Column(name ="ors",nullable = false)
+    @Column(name ="ors")
     private String ors;
 
     /** 数量単位コード（１） */
-    @Column(name ="qt1",nullable = false)
+    @Column(name ="qt1")
     private String qt1;
 
     /** 内国消費税等種別コード */
-    @Column(name ="tx_",nullable = false)
+    @Column(name ="tx_")
     private String tx_;
 
     /** インボイス識別 */
-    @Column(name ="iv1",nullable = false)
+    @Column(name ="iv1")
     private String iv1;
 
     /** 評価区分コード */
-    @Column(name ="vd1",nullable = false)
+    @Column(name ="vd1")
     private String vd1;
 
     /** 数据版本号 乐观锁*/

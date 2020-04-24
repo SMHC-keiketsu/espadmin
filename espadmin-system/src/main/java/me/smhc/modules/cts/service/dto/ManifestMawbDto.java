@@ -74,9 +74,6 @@ public class ManifestMawbDto implements Serializable {
     /** 申告等種別コード */
     private String icb;
 
-    /** 大額・少額識別 */
-    private String ls;
-
     /** あて先官署コード */
     private String ch;
 

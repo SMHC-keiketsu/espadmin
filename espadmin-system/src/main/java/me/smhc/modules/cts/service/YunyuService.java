@@ -71,10 +71,12 @@ public interface YunyuService {
      */
     List<YunyuDto> findByKensakuTel(String kensakuTel);
 
+
     /**
-     * 根据法人番号查找輸入者
+     * 根据輸入者コードOR法人番号查找輸入者
+     * @param yunyuCd   輸入者コード
      * @param houjinNo　法人番号
      * @return  輸入者
      */
-    YunyuDto findByHoujinNo(String houjinNo);
+    YunyuDto findByYunyuCdOrHoujinNo(String yunyuCd, String houjinNo);
 }

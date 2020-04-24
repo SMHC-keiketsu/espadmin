@@ -164,7 +164,7 @@ public class ManifestHawbDto implements Serializable {
     private BigDecimal dpr;
 
     /** 記事 */
-    private String nt1;
+    private String nt2;
 
     /** 荷主セクションコード */
     private String nsc;
