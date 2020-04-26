@@ -14,11 +14,11 @@ import me.smhc.annotation.Query;
 public class PermitQueryCriteria {
     /** 模糊 */
     @Query(type = Query.Type.INNER_LIKE)
-    private String hab;
+    private String hawbNo;
 
     /** 模糊 */
     @Query(type = Query.Type.INNER_LIKE)
-    private String mab;
+    private String mawbNo;
 
     /** BETWEEN */
     @Query(type = Query.Type.BETWEEN)

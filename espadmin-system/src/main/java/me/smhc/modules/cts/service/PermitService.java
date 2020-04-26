@@ -59,14 +59,9 @@ public interface PermitService {
     void deleteAll(Long[] ids);
 
     /**
-    * 导出数据
-    * @param all 待导出的数据
-    * @param response /
-    * @throws IOException /
-    */
-    void download(List<PermitDto> all, HttpServletResponse response) throws IOException;
-
+     * 查询名称
+     * @param fileName
+     * @return Permit
+     */
     Permit findByFileName(String fileName);
-
-    void addPermit(File file);
 }
