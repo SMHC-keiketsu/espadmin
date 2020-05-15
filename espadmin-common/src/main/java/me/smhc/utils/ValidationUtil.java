@@ -17,14 +17,14 @@ import java.util.regex.Pattern;
  * @author Zheng Jie
  * @date 2018-11-23
  */
-public class ValidationUtil {
+public class ValidationUtil{
 
     /**
      * 验证空
      */
-    public static void isNull(Object obj, String entity, String parameter, Object value) {
-        if (ObjectUtil.isNull(obj)) {
-            String msg = entity + " 不存在: " + parameter + " is " + value;
+    public static void isNull(Object obj, String entity, String parameter , Object value){
+        if(ObjectUtil.isNull(obj)){
+            String msg = entity + " 不存在: "+ parameter +" is "+ value;
             throw new BadRequestException(msg);
         }
     }
@@ -178,5 +178,4 @@ public class ValidationUtil {
         Matcher m = p.matcher(str);
         return m.find();
     }
-
 }
